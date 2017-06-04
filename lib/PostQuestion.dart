@@ -158,6 +158,7 @@ class PostQuestionState extends State<PostQuestion>{
     String userPhoto = this.postIsAnonymous ? null : user.currentUser.photoUrl;
     final reference = FirebaseDatabase.instance.reference().child('posts');
 
+
     showDialog(
       child: new Dialog(
           child: new ConstrainedBox(
@@ -181,18 +182,25 @@ class PostQuestionState extends State<PostQuestion>{
 
     );
 
-    //push to db
-     await reference.child(classKey).push().set({
-      'subject' : subject,
-      'post' : post,
-      'tag' : tag,
-      'username' : username,
-      'user_id' : userId,
-      'photo_url' : userPhoto
-    });
+    bool fieldsFilled = subject != "" && tag != "" && post != "";
+
+    if(fieldsFilled) {
+      //push to db
+      await reference.child(classKey).push().set({
+        'subject': subject,
+        'post': post,
+        'tag': tag,
+        'username': username,
+        'user_id': userId,
+        'photo_url': userPhoto
+      });
+      _postSuccess(context);
+    }else{
+      _postFailed(context);
+    }
 
 
-     _postSuccess(context);
+
 
 
   }
@@ -232,6 +240,34 @@ class PostQuestionState extends State<PostQuestion>{
     setState((){
       this.postIsAnonymous = value;
     });
+  }
+
+  void _postFailed(BuildContext context) {
+    Navigator.of(context).pop();
+
+    showDialog(
+      child: new Dialog(
+
+          child: new ConstrainedBox(
+              constraints: new BoxConstraints(
+                maxHeight: 100.1,
+                maxWidth: 10.1,
+                minHeight: 100.0,
+                minWidth: 10.0,
+              ),
+              child: new Column(
+                  children: <Widget> [
+                    new Divider(color: Colors.white),
+                    new Text("Submit Failed. All fields must be filled", textAlign: TextAlign.center),
+                    new Divider(color: Colors.white, height: 12.0),
+                    new Icon(Icons.cancel, size: 50.0, color: Colors.red)
+                  ]
+              )
+          )
+      ),
+      context: context,
+
+    );
   }
 }
 

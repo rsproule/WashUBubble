@@ -23,10 +23,15 @@ final auth = FirebaseAuth.instance;
         accessToken: credentials.accessToken,
       );
     }
+
   }
 
   checkLogin(){
     _ensureLoggedIn();
+  }
+
+  logout() async{
+    await googleSignIn.signOut();
   }
 
   GoogleSignIn getUser(){
