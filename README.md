@@ -1,6 +1,6 @@
 # wububble
 
-A new flutter project.
+A cross platform mobile app for Wash U students for class collaboration and networking. Created using Flutter.
 
 ## Getting Started
 
