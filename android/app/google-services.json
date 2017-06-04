@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "748998029320",
+    "firebase_url": "https://washu-bubble.firebaseio.com",
+    "project_id": "washu-bubble",
+    "storage_bucket": "washu-bubble.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748998029320:android:b0545f255ab3c181",
+        "android_client_info": {
+          "package_name": "com.yourcompany.wububble"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "748998029320-hm5fgv2mbvg09ilev3hdauger2ppsfa3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yourcompany.wububble",
+            "certificate_hash": "f6146daa9a52d643a482c1feb446b8aff2b27817"
+          }
+        },
+        {
+          "client_id": "748998029320-2hislc2al3556eum901qgpmv2thkee5t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6IZ7DxtNC7LXEVXbt3_Hp8W0PRcvl3jg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "748998029320-oiat7mfcbnu9ckafu12g471h99luh4lu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yourcompany.wububble"
+              }
+            },
+            {
+              "client_id": "748998029320-2hislc2al3556eum901qgpmv2thkee5t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
