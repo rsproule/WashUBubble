@@ -1,12 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import './loginStuff.dart' as login;
-
 import 'package:google_sign_in/google_sign_in.dart';
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 class PostTile extends StatefulWidget{
   final DataSnapshot snapshot;
