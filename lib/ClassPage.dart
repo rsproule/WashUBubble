@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import './PostQuestion.dart' as newQuestion;
 import './PostTile.dart' as post;
+import './MessageBoard.dart' as msg;
 import './loginStuff.dart' as login;
 
 import 'package:google_sign_in/google_sign_in.dart';
@@ -44,7 +45,6 @@ class ClassPageState extends State<ClassPage>
 
 
   TabController _tabController;
-  int currentState = 0;
 
 
   String classKey, name, professor, code;
@@ -72,8 +72,7 @@ class ClassPageState extends State<ClassPage>
                 Icons.info_outline, color: Colors.white),
                 onPressed: showInfo
             ),
-            currentState == 0
-            ? new IconButton(icon: new Icon(
+            new IconButton(icon: new Icon(
                 Icons.create, color: Colors.white),
                 onPressed: () {
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -84,8 +83,7 @@ class ClassPageState extends State<ClassPage>
                   );
                 }
 
-            )
-            : new Container(),
+    ),
 
           ]
       ),
@@ -111,17 +109,18 @@ class ClassPageState extends State<ClassPage>
                               itemBuilder: (context, DataSnapshot snapshot,
                                   Animation<double> animation) {
                                 return new Column(
-                                    children: <StatefulWidget>[
+                                    children: <Widget>[
                                       new post.PostTile(
                                         snapshot: snapshot,
                                         animation: animation,
-                                      )
+                                      ),
+                                      new Divider(),
                                     ]
                                 );
                               }
 
                           ),
-                      new Text(_tabController.index.toString())
+                      new msg.MessageBoard(this.classKey)
                     ]
                 )
             ),
