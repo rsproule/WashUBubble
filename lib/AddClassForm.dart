@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 
-class AddClassForm extends StatefulWidget{
+class AddClassForm extends StatefulWidget {
   @override
   AddClassFormState createState() => new AddClassFormState();
 }
@@ -28,7 +28,7 @@ class AddClassFormState extends State<AddClassForm> {
 
                 new TextFormField(
                   //name of new class
-                  controller: nameController,
+                    controller: nameController,
                     decoration: new InputDecoration(
                       icon: new Icon(Icons.school),
                       hintText: "Class Title (i.e. 'Intro to Computer Science')",
@@ -38,8 +38,8 @@ class AddClassFormState extends State<AddClassForm> {
                 ),
                 new Divider(),
                 new TextFormField(
-                  controller: codeController,
-                  //name of new class
+                    controller: codeController,
+                    //name of new class
                     decoration: new InputDecoration(
                       icon: new Icon(Icons.school),
                       hintText: "Class Code (i.e. 'CSE 131')",
@@ -50,7 +50,7 @@ class AddClassFormState extends State<AddClassForm> {
                 new Divider(),
                 new TextFormField(
                   //name of new class
-                  controller: professorController,
+                    controller: professorController,
                     decoration: new InputDecoration(
                       icon: new Icon(Icons.person),
                       hintText: "Professor Name",
@@ -62,39 +62,40 @@ class AddClassFormState extends State<AddClassForm> {
                 new Divider(color: Colors.transparent),
                 new Column(children: <Widget>[
                   new MaterialButton(
-                    color: Colors.blue,
-                    onPressed: () => _submitClass(context),
-                    elevation: 10.0,
+                      color: Colors.blue,
+                      onPressed: () => _submitClass(context),
+                      elevation: 10.0,
 
-                    highlightColor: Colors.blueGrey,
-                    highlightElevation: 5.0,
-                    child: new Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          new Icon(Icons.add, color: Colors.white),
-                          new Text("Submit Class",
-                              style: new TextStyle(color: Colors.white))
-                        ]
-                    )
-                )]),
+                      highlightColor: Colors.blueGrey,
+                      highlightElevation: 5.0,
+                      child: new Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new Icon(Icons.add, color: Colors.white),
+                            new Text("Submit Class",
+                                style: new TextStyle(color: Colors.white))
+                          ]
+                      )
+                  )
+                ]),
                 new Center(
 
-                        child: new Column(
-                            children: <Widget>[
+                    child: new Column(
+                        children: <Widget>[
 
-                              new Padding(
-                                padding: new EdgeInsets.all(25.0),
-                                child: new Text(
-                                  "Be sure to check if a class exists already"
-                                      " before adding.",
-                                  textAlign: TextAlign.center,
+                          new Padding(
+                            padding: new EdgeInsets.all(25.0),
+                            child: new Text(
+                              "Be sure to check if a class exists already"
+                                  " before adding.",
+                              textAlign: TextAlign.center,
 
-                                ),
+                            ),
 
-                              ),
-                            ]
-                        )
+                          ),
+                        ]
+                    )
 
 
                 ),
@@ -107,9 +108,7 @@ class AddClassFormState extends State<AddClassForm> {
     );
   }
 
-   _submitClass(BuildContext context) async {
-
-
+  _submitClass(BuildContext context) async {
     showDialog(
       child: new Dialog(
           child: new ConstrainedBox(
@@ -120,9 +119,10 @@ class AddClassFormState extends State<AddClassForm> {
                 minWidth: 10.0,
               ),
               child: new Column(
-                  children: <Widget> [
+                  children: <Widget>[
                     new Divider(color: Colors.white),
-                    new Text("Submitting Class...", textAlign: TextAlign.center),
+                    new Text(
+                        "Submitting Class...", textAlign: TextAlign.center),
                     new Divider(color: Colors.white, height: 12.0),
                     new CircularProgressIndicator()
                   ]
@@ -138,17 +138,23 @@ class AddClassFormState extends State<AddClassForm> {
     String professor = professorController.text;
     login.checkLogin();
 
-    //push to the db
-    await reference.push().set({
-      'name': name,
-      'code': code,
-      'professor': professor,
-    });
+    bool fieldsFilled = name != "" && code != "" && professor != "";
 
-    callback(context);
+    if (fieldsFilled) {
+      //push to the db
+      await reference.push().set({
+        'name': name,
+        'code': code,
+        'professor': professor,
+      });
+
+      _postSuccess(context);
+    } else {
+      _postFailed(context);
+    }
   }
 
-  void callback(context){
+  void _postSuccess(context) {
     Navigator.of(context).pop();
     nameController.clear();
     codeController.clear();
@@ -165,9 +171,10 @@ class AddClassFormState extends State<AddClassForm> {
                 minWidth: 10.0,
               ),
               child: new Column(
-                  children: <Widget> [
+                  children: <Widget>[
                     new Divider(color: Colors.white),
-                    new Text("Submitted Successfully!", textAlign: TextAlign.center),
+                    new Text(
+                        "Submitted Successfully!", textAlign: TextAlign.center),
                     new Divider(color: Colors.white, height: 12.0),
                     new Icon(Icons.check, size: 50.0, color: Colors.green)
                   ]
@@ -178,4 +185,33 @@ class AddClassFormState extends State<AddClassForm> {
 
     );
   }
+}
+
+void _postFailed(BuildContext context) {
+  Navigator.of(context).pop();
+
+  showDialog(
+    child: new Dialog(
+
+        child: new ConstrainedBox(
+            constraints: new BoxConstraints(
+              maxHeight: 100.1,
+              maxWidth: 10.1,
+              minHeight: 100.0,
+              minWidth: 10.0,
+            ),
+            child: new Column(
+                children: <Widget>[
+                  new Divider(color: Colors.white),
+                  new Text("Submit Failed. All fields must be filled",
+                      textAlign: TextAlign.center),
+                  new Divider(color: Colors.white, height: 12.0),
+                  new Icon(Icons.cancel, size: 50.0, color: Colors.red)
+                ]
+            )
+        )
+    ),
+    context: context,
+
+  );
 }

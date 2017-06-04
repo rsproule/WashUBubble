@@ -54,7 +54,8 @@ class SchoolPageState extends State<SchoolPage>
                     new addclass.AddClassForm(),
 
                   ]
-              ))
+              )
+          )
 
         ]
 

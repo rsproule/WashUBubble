@@ -15,14 +15,14 @@ final auth = FirebaseAuth.instance;
     if (user == null) {
       await googleSignIn.signIn();
     }
-    if (auth.currentUser == null) {  //new
-      GoogleSignInAuthentication credentials =
-      await googleSignIn.currentUser.authentication;
-      await auth.signInWithGoogle(
-        idToken: credentials.idToken,
-        accessToken: credentials.accessToken,
-      );
-    }
+//    if (auth.currentUser == null) {  //new
+//      GoogleSignInAuthentication credentials =
+//      await googleSignIn.currentUser.authentication;
+//      await auth.signInWithGoogle(
+//        idToken: credentials.idToken,
+//        accessToken: credentials.accessToken,
+//      );
+//    }
 
   }
 
