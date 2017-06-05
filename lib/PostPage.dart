@@ -23,8 +23,10 @@ class PostPageState extends State<PostPage> {
       .child("threadNodes");
 
 
+
   PostPageState(DataSnapshot s) {
     this.postSnapshot = s;
+    _getThreads();
   }
 
   @override
@@ -35,8 +37,8 @@ class PostPageState extends State<PostPage> {
 
         ),
 
-        body: new ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
+        body: new Column(
+//            physics: const AlwaysScrollableScrollPhysics(),
 
             children: <Widget>[
               //Subject of post:
@@ -162,9 +164,10 @@ class PostPageState extends State<PostPage> {
 
 
               //All the root thread nodes for this post:
-//              new Flexible(
-//                  child: new FirebaseAnimatedList(
-//                      physics: const AlwaysScrollableScrollPhysics(),
+              new Flexible(
+                  child: new Text("Thread here")
+//                  new FirebaseAnimatedList(
+////                      physics: const AlwaysScrollableScrollPhysics(),
 //
 //                      query: replyReference.child(postSnapshot.key),
 //                      // the root nodes to the current post
@@ -183,8 +186,8 @@ class PostPageState extends State<PostPage> {
 //                        );
 //                      }
 //                  )
-//
-//              )
+
+              )
 
             ]
 
@@ -197,18 +200,42 @@ class PostPageState extends State<PostPage> {
     String reply = replyController.text;
 
     await replyReference.child(this.postSnapshot.key).push().set({
-      'parent': null,
-      'content': reply
+      'parent': "root",
+      'content': reply,
+      'children': {
+        'hasChildren' : false
+      }
     });
 
     replyController.clear();
   }
 
+
+
+
+
+
   void _refresh() {
     //this will set the graph of nodes with setState ?
 
   }
+
+  void _getThreads() {}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class ReplyTile extends StatefulWidget {
   DataSnapshot s;
