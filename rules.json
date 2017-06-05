@@ -1,0 +1,39 @@
+{
+  "rules": {
+    "classes" : {
+      ".read" : true,
+      "$class_id": {
+
+        ".write" : true,
+        ".validate" : "newData.hasChildren(['name', 'code', 'professor'])"
+      }
+    },
+    "members": {
+      ".read" : true,
+
+      "$class_id": {
+
+        // room must already exist to add a member
+        ".validate": "root.child('classes/'+$class_id).exists()",
+
+        "$user_id": {
+          ".write": true
+        }
+      }
+    },
+    "posts" : {
+      // read only if member of the class
+      ".read": true,
+      "$question_id" : {
+        //write only if member of class also
+        ".write" : true
+      }
+    },
+    "messages": {
+      ".read" : true,
+      "$class_id":{
+        ".write" : true
+      }
+    }
+  }
+}

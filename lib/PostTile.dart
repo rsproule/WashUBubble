@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import './PostPage.dart' as post;
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
@@ -58,6 +59,18 @@ class PostTileState extends State<PostTile> {
                         snapshot.value['tag']
                 ),
 
+                onTap: () {
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return new Container(
+                            child: new post.PostPage(snapshot)
+                        );
+
+
+                      }
+                  )
+                  );
+                },
 
               )
 

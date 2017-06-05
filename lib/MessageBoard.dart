@@ -81,8 +81,12 @@ class MessageBoardState extends State<MessageBoard> {
                     ),
 
                     new IconButton(
-                        icon: new Icon(Icons.send),
-                        onPressed: isTyping ? _sendMessage : null
+                        icon: isTyping
+                            ? new Icon(Icons.send, color: Theme.of(context).accentColor)
+                            : new Icon(Icons.send),
+                        onPressed: isTyping ? _sendMessage : null,
+
+
                     )
                   ]
               )
