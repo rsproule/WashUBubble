@@ -184,12 +184,20 @@ class PostQuestionState extends State<PostQuestion>{
 
     bool fieldsFilled = subject != "" && tag != "" && post != "";
 
-    if(fieldsFilled) {
+    //get current time, sadly had to make a months array
+    DateTime d = new DateTime.now();
+    TimeOfDay t = new TimeOfDay.now();
+     List<String> months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+     String timestamp =  months[d.month-1] + " " + d.day.toString() + ", " +  d.year.toString() + " " + t.toString();
+
+
+     if(fieldsFilled) {
       //push to db
       await reference.child(classKey).push().set({
         'subject': subject,
         'post': post,
         'tag': tag,
+        'timestamp' : timestamp,
         'username': username,
         'user_id': userId,
         'photo_url': userPhoto
@@ -198,9 +206,6 @@ class PostQuestionState extends State<PostQuestion>{
     }else{
       _postFailed(context);
     }
-
-
-
 
 
   }

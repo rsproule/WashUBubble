@@ -16,9 +16,10 @@ class PostPage extends StatefulWidget {
 }
 
 class PostPageState extends State<PostPage> {
-  DatabaseReference postRef;
-
   DataSnapshot postSnapshot;
+  bool replyIsFilled = false;
+  TextEditingController replyController = new TextEditingController();
+
 
   PostPageState(DataSnapshot s) {
     this.postSnapshot = s;
@@ -55,8 +56,11 @@ class PostPageState extends State<PostPage> {
                       children: <Widget>[
                         new Container(
                             margin: const EdgeInsets.all(10.0),
-                            child: new GoogleUserCircleAvatar(
-                                this.postSnapshot.value['photo_url'])
+                            child: this.postSnapshot.value['photo_url'] != null
+                                ? new GoogleUserCircleAvatar(
+                                this.postSnapshot.value['photo_url']
+                            ) :
+                            new CircleAvatar(child: new Text("?"))
                         ),
                         new Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +79,11 @@ class PostPageState extends State<PostPage> {
                                 margin: const EdgeInsets.only(
                                     left: 10.0, right: 10.0),
                                 child: new Text(
-                                    "Jan 13, 2017 5:34 PM", style: Theme
+                                    this.postSnapshot.value['timestamp'] != null
+                                    ? this.postSnapshot.value['timestamp']
+                                    : "Uknown Time"
+                                    ,
+                                    style: Theme
                                     .of(context)
                                     .textTheme
                                     .caption),
@@ -98,17 +106,57 @@ class PostPageState extends State<PostPage> {
                 alignment: FractionalOffset.topLeft,
 
                 child: new Text(
-                    this.postSnapshot.value['post'],
+                    "     " + this.postSnapshot.value['post'],
                     style: Theme
                         .of(context)
                         .textTheme
                         .subhead, textAlign: TextAlign.left),
               ),
 
-              new Divider()
+              new Divider(height: 30.0),
+
+
+              //Main response field:
+              new Row(
+                  children: <Widget>[
+                    new Flexible(
+                        child: new TextField(
+                            onChanged: (String val){
+                              setState((){
+                                this.replyIsFilled = val != "";
+                              });
+                            },
+                            controller: replyController,
+                            maxLines: 3,
+                            decoration: new InputDecoration(
+                                hideDivider: true,
+                                hintText: "Add a Response",
+                                icon: new Icon(Icons.reply)
+                            )
+                        )
+                    ),
+                    
+                    new MaterialButton(
+                        child: new Text("Reply"),
+                        splashColor: Colors.blue,
+                        textColor: this.replyIsFilled ? Colors.blue: Colors.grey,
+                        onPressed: this.replyIsFilled ? _postReply : null
+                    )
+                  ]
+              ),
+
+
+              new Divider(),
+
+              //All the responses:
+
+
 
             ]
         )
     );
+  }
+
+  void _postReply() {
   }
 }
