@@ -19,6 +19,8 @@ class PostPageState extends State<PostPage> {
   DataSnapshot postSnapshot;
   bool replyIsFilled = false;
   TextEditingController replyController = new TextEditingController();
+  DatabaseReference replyReference = FirebaseDatabase.instance.reference()
+      .child("threadNodes");
 
 
   PostPageState(DataSnapshot s) {
@@ -32,9 +34,13 @@ class PostPageState extends State<PostPage> {
           title: new Text("Thread"),
 
         ),
-        body: new Column(
+
+        body: new ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+
             children: <Widget>[
               //Subject of post:
+
               new Center(
                   child: new Container(
                     margin: const EdgeInsets.only(top: 20.0),
@@ -56,7 +62,8 @@ class PostPageState extends State<PostPage> {
                       children: <Widget>[
                         new Container(
                             margin: const EdgeInsets.all(10.0),
-                            child: this.postSnapshot.value['photo_url'] != null
+                            child: this.postSnapshot.value['photo_url'] !=
+                                null
                                 ? new GoogleUserCircleAvatar(
                                 this.postSnapshot.value['photo_url']
                             ) :
@@ -79,14 +86,16 @@ class PostPageState extends State<PostPage> {
                                 margin: const EdgeInsets.only(
                                     left: 10.0, right: 10.0),
                                 child: new Text(
-                                    this.postSnapshot.value['timestamp'] != null
-                                    ? this.postSnapshot.value['timestamp']
-                                    : "Uknown Time"
+                                    this.postSnapshot.value['timestamp'] !=
+                                        null
+                                        ? this.postSnapshot
+                                        .value['timestamp']
+                                        : "Uknown Time"
                                     ,
                                     style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .caption),
+                                        .of(context)
+                                        .textTheme
+                                        .caption),
                               ),
 
                             ]
@@ -113,16 +122,18 @@ class PostPageState extends State<PostPage> {
                         .subhead, textAlign: TextAlign.left),
               ),
 
-              new Divider(height: 30.0),
-
+              new Container(
+                  padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                  child: new Divider(height: 30.0)
+              ),
 
               //Main response field:
               new Row(
                   children: <Widget>[
                     new Flexible(
                         child: new TextField(
-                            onChanged: (String val){
-                              setState((){
+                            onChanged: (String val) {
+                              setState(() {
                                 this.replyIsFilled = val != "";
                               });
                             },
@@ -135,11 +146,12 @@ class PostPageState extends State<PostPage> {
                             )
                         )
                     ),
-                    
+
                     new MaterialButton(
                         child: new Text("Reply"),
                         splashColor: Colors.blue,
-                        textColor: this.replyIsFilled ? Colors.blue: Colors.grey,
+                        textColor: this.replyIsFilled ? Colors.blue : Colors
+                            .grey,
                         onPressed: this.replyIsFilled ? _postReply : null
                     )
                   ]
@@ -148,15 +160,110 @@ class PostPageState extends State<PostPage> {
 
               new Divider(),
 
-              //All the responses:
 
-
+              //All the root thread nodes for this post:
+//              new Flexible(
+//                  child: new FirebaseAnimatedList(
+//                      physics: const AlwaysScrollableScrollPhysics(),
+//
+//                      query: replyReference.child(postSnapshot.key),
+//                      // the root nodes to the current post
+//                      defaultChild: new Container(height: 100.0,
+//                          child: new Center(
+//                              child: new Text("Be the first to respond"))),
+//                      itemBuilder: (_, DataSnapshot snapshot,
+//                          Animation<double> animation) {
+//                        return new Column(
+//                            children: <StatefulWidget>[
+//                              new ReplyTile(
+//                                  snapshot, animation,
+//                                  this.postSnapshot.key)
+//
+//                            ]
+//                        );
+//                      }
+//                  )
+//
+//              )
 
             ]
+
         )
+
     );
   }
 
-  void _postReply() {
+  _postReply() async {
+    String reply = replyController.text;
+
+    await replyReference.child(this.postSnapshot.key).push().set({
+      'parent': null,
+      'content': reply
+    });
+
+    replyController.clear();
+  }
+
+  void _refresh() {
+    //this will set the graph of nodes with setState ?
+
+  }
+}
+
+class ReplyTile extends StatefulWidget {
+  DataSnapshot s;
+  Animation a;
+  String parent;
+
+  ReplyTile(DataSnapshot s, Animation a, String parent) {
+    this.s = s;
+    this.a = a;
+    this.parent = parent;
+  }
+
+  @override
+  ReplyTileState createState() => new ReplyTileState(s, a, parent);
+}
+
+class ReplyTileState extends State<ReplyTile> {
+  DataSnapshot snapshot;
+  Animation animation;
+  String parent;
+  DatabaseReference replyReference = FirebaseDatabase.instance.reference()
+      .child("threadNodes");
+
+
+  ReplyTileState(DataSnapshot s, Animation a, String parent) {
+    this.snapshot = s;
+    this.animation = a;
+  }
+
+
+  Widget build(BuildContext context) {
+    return new Text(snapshot.value['content']);
+//
+//
+// Column(
+//      children: <Widget> [
+//
+//
+//
+//        //any children
+//        new Container(
+//            child: new FirebaseAnimatedList(
+//                query: replyReference.child(this.parent),
+//                defaultChild: new Container(height: 100.0, child: new Center(child: new Text("Respond"))),
+//                itemBuilder: (_, DataSnapshot snapshot,
+//                    Animation<double> animation) {
+//                  return new Column(
+//                      children: <StatefulWidget>[
+//                        new ReplyTile(snapshot, animation, this.parent)
+//                      ]
+//                  );
+//                }
+//            )
+//        )
+//      ]
+//    );
   }
 }
