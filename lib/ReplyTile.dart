@@ -26,7 +26,7 @@ class ReplyTileState extends State<ReplyTile> {
   DatabaseReference threadInPostReference;
   TextEditingController replyController = new TextEditingController();
   List<String> threadChildren = [];
-  List<ReplyTile> childrenTiles= [];
+  List<ReplyTile> childrenTiles = [];
   bool hasChildren;
 
 
@@ -35,24 +35,26 @@ class ReplyTileState extends State<ReplyTile> {
     this.animation = a;
     this.postKey = postKey;
     Map m = s.value['children'];
-    m.forEach((k, v){
-      if(k == 'hasChildren'){
+    m.forEach((k, v) {
+      if (k == 'hasChildren') {
         hasChildren = v;
-      }else{
+      } else {
         threadChildren.add(k);
-        DatabaseReference ref = FirebaseDatabase.instance.reference().child("threadNodes")
+        DatabaseReference ref = FirebaseDatabase.instance.reference().child(
+            "threadNodes")
             .child(postKey).child(k);
         getChildren(ref);
       }
-
     });
   }
 
-  getChildren(DatabaseReference ref) async{
+  getChildren(DatabaseReference ref) async {
     DataSnapshot s = await ref.once();
     Animation<double> animation1;
     ReplyTile childTile = new ReplyTile(s, animation1, this.postKey);
-    this.childrenTiles.add(childTile);
+    setState(() {
+      this.childrenTiles.add(childTile);
+    });
 //    print(s.value['content']);
   }
 
@@ -69,7 +71,7 @@ class ReplyTileState extends State<ReplyTile> {
                           showDialog(
                               context: context,
                               child:
-                              new Dialog( child:
+                              new Dialog(child:
                               new Container(
                                   height: 300.0,
                                   child: new Column(
@@ -98,7 +100,6 @@ class ReplyTileState extends State<ReplyTile> {
                               )
 
 
-
                               )
                           );
                         }
@@ -106,7 +107,8 @@ class ReplyTileState extends State<ReplyTile> {
 
                 ),
                 new Container(
-                    margin: const EdgeInsets.only(right: 10.0, top: 10.0, bottom: 10.0),
+                    margin: const EdgeInsets.only(
+                        right: 10.0, top: 10.0, bottom: 10.0),
                     child: snapshot.value['photo_url'] !=
                         null
                         ? new GoogleUserCircleAvatar(
@@ -144,11 +146,11 @@ class ReplyTileState extends State<ReplyTile> {
 
               ]
           ),
-          new Divider(),
+//          new Divider(),
           this.hasChildren
 
               ? new Container(
-              margin: const EdgeInsets.only(left: 10.0),
+              margin: const EdgeInsets.only(left: 20.0),
               child: new Column(children: childrenTiles)
           )
               : new Container()
@@ -160,9 +162,13 @@ class ReplyTileState extends State<ReplyTile> {
   }
 
   _sendReply() async {
-    threadInPostReference = FirebaseDatabase.instance.reference().child("threadNodes").child("-Klijw0f90DHFV9n_B4D"); // the post container
+
+    threadInPostReference = FirebaseDatabase.instance.reference().child("threadNodes").child(
+            snapshot.value['parent']); // the post container
     String content = replyController.text;
-    GoogleSignInAccount user = login.getUser().currentUser;
+    GoogleSignInAccount user = login
+        .getUser()
+        .currentUser;
 
     DatabaseReference newRef = threadInPostReference.push();
     String newKey = newRef.key;
@@ -185,19 +191,15 @@ class ReplyTileState extends State<ReplyTile> {
       //this deletes everything that is there... i think we can replace with all snapshot data np
       "parent": snapshot.value['parent'],
       "content": snapshot.value['content'],
-      'children': {                 //new
+      'children': { //new
         'hasChildren': true,
         newKey: true
       },
       'username': snapshot.value['username'],
       'photo_url': snapshot.value['photo_url'],
       'user_id': snapshot.value['user_id']
-
-
-
     });
 
     replyController.clear();
-
   }
 }

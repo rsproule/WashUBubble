@@ -24,11 +24,33 @@ class PostPageState extends State<PostPage> {
   DatabaseReference replyReference = FirebaseDatabase.instance.reference()
       .child("threadNodes");
   List<DataSnapshot> threads;
+  PageController pageController = new PageController();
+  List<replyTile.ReplyTile> threadTiles = [];
+  bool hasChildren;
 
 
   PostPageState(DataSnapshot s) {
     this.postSnapshot = s;
-    //_getThreads();
+
+    _getThreads(replyReference.child(this.postSnapshot.key)); //all the replies in this post
+  }
+
+  _getThreads(DatabaseReference ref) async {
+    DataSnapshot s = await ref.once();
+    Map m = s.value;   //all the replies in this post in a map
+    m.forEach((k, v) async {
+      DataSnapshot snap = await ref.child(k).once();
+      Animation<double> animation1;
+      replyTile.ReplyTile childTile;
+      if(v['parent'] == this.postSnapshot.key) {
+         childTile = new replyTile.ReplyTile(
+            snap, animation1, this.postSnapshot.key);
+         setState(() {
+           this.threadTiles.add(childTile);
+         });
+      }
+    });
+
   }
 
   @override
@@ -39,159 +61,152 @@ class PostPageState extends State<PostPage> {
 
         ),
 
-        body: new Column(
-//            physics: const AlwaysScrollableScrollPhysics(),
+        body: new PageView(
+            controller: pageController,
+            scrollDirection: Axis.vertical,
             children: <Widget>[
-              //Subject of post:
 
-              new Center(
-                  child: new Container(
-                    margin: const EdgeInsets.only(top: 20.0),
-                    child: new Text(
-                        this.postSnapshot.value['subject'], style: Theme
-                        .of(context)
-                        .textTheme
-                        .title),
-                  )
-              ),
-              new Container(
-                  padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                  child: new Divider(height: 30.0)
-              ),
+              new Column(
+                  children: <Widget>[
 
-              // User information and time of post:
-              new Container(
-                  child: new Row(
-                      children: <Widget>[
-                        new Container(
-                            margin: const EdgeInsets.all(10.0),
-                            child: this.postSnapshot.value['photo_url'] !=
-                                null
-                                ? new GoogleUserCircleAvatar(
-                                this.postSnapshot.value['photo_url']
-                            ) :
-                            new CircleAvatar(child: new Text("?"))
-                        ),
-                        new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    //Subject of post:
+                    new Center(
+                        child: new Container(
+                          margin: const EdgeInsets.only(top: 20.0),
+                          child: new Text(
+                              this.postSnapshot.value['subject'], style: Theme
+                              .of(context)
+                              .textTheme
+                              .title),
+                        )
+                    ),
+                    new Container(
+                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                        child: new Divider(height: 30.0)
+                    ),
+
+                    // User information and time of post:
+                    new Container(
+                        child: new Row(
                             children: <Widget>[
                               new Container(
-                                margin: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: new Text(
-                                    this.postSnapshot.value['username'],
-                                    style: Theme
-                                        .of(context)
-                                        .textTheme
-                                        .subhead),
+                                  margin: const EdgeInsets.all(10.0),
+                                  child: this.postSnapshot.value['photo_url'] !=
+                                      null
+                                      ? new GoogleUserCircleAvatar(
+                                      this.postSnapshot.value['photo_url']
+                                  ) :
+                                  new CircleAvatar(child: new Text("?"))
                               ),
-                              new Container(
-                                margin: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: new Text(
-                                    this.postSnapshot.value['timestamp'] !=
-                                        null
-                                        ? this.postSnapshot
-                                        .value['timestamp']
-                                        : "Uknown Time"
-                                    ,
-                                    style: Theme
-                                        .of(context)
-                                        .textTheme
-                                        .caption),
-                              ),
+                              new Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    new Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 10.0, right: 10.0),
+                                      child: new Text(
+                                          this.postSnapshot.value['username'],
+                                          style: Theme
+                                              .of(context)
+                                              .textTheme
+                                              .subhead),
+                                    ),
+                                    new Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 10.0, right: 10.0),
+                                      child: new Text(
+                                          this.postSnapshot
+                                              .value['timestamp'] !=
+                                              null
+                                              ? this.postSnapshot
+                                              .value['timestamp']
+                                              : "Uknown Time"
+                                          ,
+                                          style: Theme
+                                              .of(context)
+                                              .textTheme
+                                              .caption),
+                                    ),
 
+                                  ]
+                              ),
                             ]
-                        ),
-                      ]
-                  )
-              ),
-
-              new Container(
-                  padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                  child: new Divider(height: 30.0)
-              ),
-
-              //Question or post body:
-              new Container(
-                margin: const EdgeInsets.all(10.0),
-                alignment: FractionalOffset.topLeft,
-
-                child: new Text(
-                    "     " + this.postSnapshot.value['post'],
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .subhead, textAlign: TextAlign.left),
-              ),
-
-              new Container(
-                  padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                  child: new Divider(height: 30.0)
-              ),
-
-              //Main response field:
-              new Row(
-                  children: <Widget>[
-                    new Flexible(
-                        child: new TextField(
-                            onChanged: (String val) {
-                              setState(() {
-                                this.replyIsFilled = val != "";
-                              });
-                            },
-                            controller: replyController,
-                            maxLines: 3,
-                            decoration: new InputDecoration(
-                                hideDivider: true,
-                                hintText: "Add a Response",
-                                icon: new Icon(Icons.reply)
-                            )
                         )
                     ),
 
-                    new MaterialButton(
-                        child: new Text("Reply"),
-                        splashColor: Colors.blue,
-                        textColor: this.replyIsFilled ? Colors.blue : Colors
-                            .grey,
-                        onPressed: this.replyIsFilled ? _sendPostResponse : null
-                    )
-                  ]
-              ),
+                    new Container(
+                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                        child: new Divider(height: 30.0)
+                    ),
+
+                    //Question or post body:
+                    new Container(
+                      margin: const EdgeInsets.all(10.0),
+                      alignment: FractionalOffset.topLeft,
+
+                      child: new Text(
+                          "     " + this.postSnapshot.value['post'],
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .subhead, textAlign: TextAlign.left),
+                    ),
+
+                    new Container(
+                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                        child: new Divider(height: 30.0)
+                    ),
 
 
-              new Divider(),
+                    //Main response field:
+                    new Row(
+                        children: <Widget>[
+                          new Flexible(
+                              child: new TextField(
+                                  onChanged: (String val) {
+                                    setState(() {
+                                      this.replyIsFilled = val != "";
+                                    });
+                                  },
+                                  controller: replyController,
+                                  maxLines: 3,
+                                  decoration: new InputDecoration(
+                                      hideDivider: true,
+                                      hintText: "Add a Response",
+                                      icon: new Icon(Icons.reply)
+                                  )
+                              )
+                          ),
+
+                          new MaterialButton(
+                              child: new Text("Reply"),
+                              splashColor: Colors.blue,
+                              textColor: this.replyIsFilled
+                                  ? Colors.blue
+                                  : Colors
+                                  .grey,
+                              onPressed: this.replyIsFilled
+                                  ? _sendPostResponse
+                                  : null
+                          )
+                        ]
+                    ),
+
+
+                    new Divider(),
+
+                  ]),
 
 
               //All the root thread nodes for this post:
-              new Flexible(
-                  child:
 
-                  new FirebaseAnimatedList(
-//                      physics: const AlwaysScrollableScrollPhysics(),
 
-                      query: replyReference.child(this.postSnapshot.key),
-                      // the root nodes to the current post
-                      defaultChild: new Container(height: 100.0,
-                          child: new Center(
-                              child: new Text("Be the first to respond"))),
-                      itemBuilder: (_, DataSnapshot snapshot,
-                          Animation<double> animation) {
-                        return
-                          //new Text("here");
-                          //shows all the nodes but need to check if the parent is the root
-                          snapshot.value['parent'] == this.postSnapshot.key?
-                          new replyTile.ReplyTile(
-                              snapshot,
-                              animation,
-                              this.postSnapshot.key
-                          ):
-                          new Container() // empty container
-                        ;
-                      }
-                  )
+              new Column(
+                  children: this.threadTiles != null
+                      ? this.threadTiles
+                      : new Text("Be the first to Respond")
               )
+
             ]
         )
     );
@@ -216,6 +231,7 @@ class PostPageState extends State<PostPage> {
 
     replyController.clear();
   }
+
 
 }
 
