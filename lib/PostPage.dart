@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import './loginStuff.dart' as login;
 
 
 class PostPage extends StatefulWidget {
@@ -21,12 +22,12 @@ class PostPageState extends State<PostPage> {
   TextEditingController replyController = new TextEditingController();
   DatabaseReference replyReference = FirebaseDatabase.instance.reference()
       .child("threadNodes");
-
+  List<DataSnapshot> threads;
 
 
   PostPageState(DataSnapshot s) {
     this.postSnapshot = s;
-    _getThreads();
+    //_getThreads();
   }
 
   @override
@@ -154,7 +155,7 @@ class PostPageState extends State<PostPage> {
                         splashColor: Colors.blue,
                         textColor: this.replyIsFilled ? Colors.blue : Colors
                             .grey,
-                        onPressed: this.replyIsFilled ? _postReply : null
+                        onPressed: this.replyIsFilled ? _sendPostResponse : null
                     )
                   ]
               ),
@@ -165,132 +166,253 @@ class PostPageState extends State<PostPage> {
 
               //All the root thread nodes for this post:
               new Flexible(
-                  child: new Text("Thread here")
-//                  new FirebaseAnimatedList(
-////                      physics: const AlwaysScrollableScrollPhysics(),
-//
-//                      query: replyReference.child(postSnapshot.key),
-//                      // the root nodes to the current post
-//                      defaultChild: new Container(height: 100.0,
-//                          child: new Center(
-//                              child: new Text("Be the first to respond"))),
-//                      itemBuilder: (_, DataSnapshot snapshot,
-//                          Animation<double> animation) {
-//                        return new Column(
-//                            children: <StatefulWidget>[
-//                              new ReplyTile(
-//                                  snapshot, animation,
-//                                  this.postSnapshot.key)
-//
-//                            ]
-//                        );
-//                      }
-//                  )
+                  child:
 
+                  new FirebaseAnimatedList(
+//                      physics: const AlwaysScrollableScrollPhysics(),
+
+                      query: replyReference.child(this.postSnapshot.key),
+                      // the root nodes to the current post
+                      defaultChild: new Container(height: 100.0,
+                          child: new Center(
+                              child: new Text("Be the first to respond"))),
+                      itemBuilder: (_, DataSnapshot snapshot,
+                          Animation<double> animation) {
+                        return
+                          //new Text("here");
+                          //shows all the nodes but need to check if the parent is the root
+                          snapshot.value['parent'] == this.postSnapshot.key?
+                          new ReplyTile(
+                              snapshot,
+                              animation,
+                              this.postSnapshot.key
+                          ):
+                          new Container() // empty container
+                        ;
+                      }
+                  )
               )
-
             ]
-
         )
-
     );
   }
 
-  _postReply() async {
+  _sendPostResponse() async {
     String reply = replyController.text;
+    GoogleSignInAccount user = login
+        .getUser()
+        .currentUser;
 
     await replyReference.child(this.postSnapshot.key).push().set({
-      'parent': "root",
+      'parent': this.postSnapshot.key,
       'content': reply,
       'children': {
-        'hasChildren' : false
-      }
+        'hasChildren': false
+      },
+      'username': user.displayName,
+      'photo_url': user.photoUrl,
+      'user_id': user.id,
     });
 
     replyController.clear();
   }
 
-
-
-
-
-
-  void _refresh() {
-    //this will set the graph of nodes with setState ?
-
-  }
-
-  void _getThreads() {}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class ReplyTile extends StatefulWidget {
   DataSnapshot s;
   Animation a;
-  String parent;
+  String postKey;
 
   ReplyTile(DataSnapshot s, Animation a, String parent) {
     this.s = s;
     this.a = a;
-    this.parent = parent;
+    this.postKey = parent;
   }
 
   @override
-  ReplyTileState createState() => new ReplyTileState(s, a, parent);
+  ReplyTileState createState() => new ReplyTileState(s, a, postKey);
 }
 
 class ReplyTileState extends State<ReplyTile> {
   DataSnapshot snapshot;
   Animation animation;
-  String parent;
-  DatabaseReference replyReference = FirebaseDatabase.instance.reference()
-      .child("threadNodes");
+  String postKey;
+  DatabaseReference threadInPostReference;
+  TextEditingController replyController = new TextEditingController();
+  List<String> threadChildren = [];
+  List<ReplyTile> childrenTiles= [];
+  bool hasChildren;
 
 
-  ReplyTileState(DataSnapshot s, Animation a, String parent) {
+  ReplyTileState(DataSnapshot s, Animation a, String postKey) {
     this.snapshot = s;
     this.animation = a;
+    this.postKey = postKey;
+    Map m = s.value['children'];
+    m.forEach((k, v){
+      if(k == 'hasChildren'){
+        hasChildren = v;
+      }else{
+        threadChildren.add(k);
+        DatabaseReference ref = FirebaseDatabase.instance.reference().child("threadNodes")
+            .child(postKey).child(k);
+        getChildren(ref);
+      }
+
+    });
+  }
+
+  getChildren(DatabaseReference ref) async{
+    DataSnapshot s = await ref.once();
+    ReplyTile childTile = new ReplyTile(s, animation, this.postKey);
+    this.childrenTiles.add(childTile);
+//    print(s.value['content']);
   }
 
 
   Widget build(BuildContext context) {
-    return new Text(snapshot.value['content']);
-//
-//
-// Column(
-//      children: <Widget> [
-//
-//
-//
-//        //any children
-//        new Container(
-//            child: new FirebaseAnimatedList(
-//                query: replyReference.child(this.parent),
-//                defaultChild: new Container(height: 100.0, child: new Center(child: new Text("Respond"))),
-//                itemBuilder: (_, DataSnapshot snapshot,
-//                    Animation<double> animation) {
-//                  return new Column(
-//                      children: <StatefulWidget>[
-//                        new ReplyTile(snapshot, animation, this.parent)
-//                      ]
-//                  );
-//                }
-//            )
-//        )
-//      ]
-//    );
+    return new Column(
+        children: <Widget>[
+          new Row(
+              children: <Widget>[
+                new Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: snapshot.value['photo_url'] !=
+                        null
+                        ? new GoogleUserCircleAvatar(
+                        snapshot.value['photo_url']
+                    ) :
+                    new CircleAvatar(child: new Text("?"))
+                ),
+                new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Container(
+                        margin: const EdgeInsets.only(
+                            left: 10.0, right: 10.0),
+                        child: new Text(
+                            snapshot.value['username'],
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .subhead),
+                      ),
+                      new Container(
+                        margin: const EdgeInsets.only(
+                            left: 10.0, right: 10.0),
+                        width: 260.0,
+                        child: new Text(
+                            snapshot.value['content']
+                            ,
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .caption),
+                      ),
+
+                    ]
+                ),
+                new Container(
+                    child: new IconButton(
+                        icon: new Icon(Icons.reply),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              child:
+                              new Dialog( child:
+                                  new Container(
+                                    height: 300.0,
+                                    child: new Column(
+                                        children: <Widget>[
+                                          new TextField(
+                                              controller: replyController,
+                                              decoration: new InputDecoration(
+                                                hintText: "Response Message",
+                                                icon: new Icon(Icons.reply),
+                                                hideDivider: true,
+
+                                              )
+                                          ),
+                                          new Divider(),
+
+                                          new MaterialButton(
+                                              color: Colors.blue,
+                                              textColor: Colors.white,
+                                              child: new Text("Send"),
+                                              onPressed:
+                                                _sendReply
+
+                                          )
+                                        ]
+                                    )
+                                  )
+
+
+
+                              )
+                          );
+                        }
+                    )
+
+                )
+              ]
+          ),
+          new Divider(),
+          this.hasChildren
+
+          ? new Container(
+              margin: const EdgeInsets.only(left: 20.0),
+              child: new Column(children: childrenTiles)
+          )
+          : new Text("No child")
+    
+          
+        ]
+
+    );
+  }
+
+  _sendReply() async {
+    threadInPostReference = FirebaseDatabase.instance.reference().child("threadNodes").child("-Klijw0f90DHFV9n_B4D"); // the post container
+    String content = replyController.text;
+    GoogleSignInAccount user = login.getUser().currentUser;
+
+    DatabaseReference newRef = threadInPostReference.push();
+    String newKey = newRef.key;
+
+    await newRef.set({
+      "parent": this.snapshot.key,
+      "content": content,
+      'children': {
+        'hasChildren': false
+      },
+      'username': user.displayName,
+      'photo_url': user.photoUrl,
+      'user_id': user.id
+    });
+
+
+    //update the parents children
+    await threadInPostReference.child(this.snapshot.key).set({
+      //this info is for the new response, look up how to do update!!! --> cant find anything :(
+      //this deletes everything that is there... i think we can replace with all snapshot data np
+      "parent": snapshot.value['parent'],
+      "content": snapshot.value['content'],
+      'children': {                 //new
+        'hasChildren': true,
+         newKey: true
+      },
+      'username': snapshot.value['username'],
+      'photo_url': snapshot.value['photo_url'],
+      'user_id': snapshot.value['user_id']
+
+
+
+    });
+
+    replyController.clear();
+
   }
 }
