@@ -27,7 +27,6 @@ class MyClassesViewState extends State<MyClassesView> {
   Widget build(BuildContext context) {
     return new Column(
         children: <Widget>[
-
           new Flexible(
               child: new FirebaseAnimatedList(
                   query: classReference,

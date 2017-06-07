@@ -223,7 +223,7 @@ class PostPageState extends State<PostPage> {
 
                     new Divider(height: 30.0),
 
-                    new Divider(height: 140.0, color: Colors.transparent),
+                    new Divider(height: 40.0, color: Colors.transparent),
 
                     new Column(
 
