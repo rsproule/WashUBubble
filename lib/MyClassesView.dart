@@ -15,13 +15,18 @@ class MyClassesView extends StatefulWidget {
 
 class MyClassesViewState extends State<MyClassesView> {
 
-  final classReference = FirebaseDatabase.instance.reference().child('classes');
+  DatabaseReference usersClasses = FirebaseDatabase.instance.reference().child('members');
 
-  Comparator alphabetical = (a, b) {
-    String aName = a.value['name'];
-    String bName = b.value['name'];
-    return aName.compareTo(bName);
-  };
+  MyClassesViewState(){
+    GoogleSignInAccount user = login.getUser().currentUser;
+    usersClasses = usersClasses.child(user.id);
+  }
+
+//  Comparator alphabetical = (a, b) {
+//    String aName = a.value['name'];
+//    String bName = b.value['name'];
+//    return aName.compareTo(bName);
+//  };
 
 
   Widget build(BuildContext context) {
@@ -29,8 +34,7 @@ class MyClassesViewState extends State<MyClassesView> {
         children: <Widget>[
           new Flexible(
               child: new FirebaseAnimatedList(
-                  query: classReference,
-                  sort: alphabetical,
+                  query: usersClasses,
                   defaultChild: new Center(
                       child: new CircularProgressIndicator()),
                   reverse: false,
@@ -75,30 +79,13 @@ class ClassTileState extends State<ClassTile> {
 
 
   ClassTileState(snapshot, animation) {
-    GoogleSignIn userInfo = login.getUser();
     this.snapshot = snapshot;
     this.animation = animation;
-    checkIfMember(userInfo.currentUser.id);
   }
 
-  checkIfMember(id) async{
-    DataSnapshot s = await reference.child(snapshot.key).once();
-    Map result = s.value;
-    bool isMem = false;
-
-    if(s.value != null) {
-      result.forEach((k, v){
-        Map p = v;
-        isMem = (p.containsKey(id));
-      });
-    }
-    setState((){
-      UserIsMember = isMem;
-    });
-  }
 
   Widget build(BuildContext context) {
-    return this.UserIsMember ? new Column(
+    return  new Column(
         children: <Widget>[
           new ListTile(
             title: new Text(snapshot.value['name'], style: Theme
@@ -123,7 +110,7 @@ class ClassTileState extends State<ClassTile> {
           new Divider()
         ]
 
-    ) : new Container();
+    ) ;
   }
 
 

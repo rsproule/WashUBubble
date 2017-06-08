@@ -146,6 +146,7 @@ class AddClassFormState extends State<AddClassForm> {
         'name': name,
         'code': code,
         'professor': professor,
+        'members' : {}
       });
 
       _postSuccess(context);

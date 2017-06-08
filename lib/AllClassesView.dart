@@ -72,38 +72,57 @@ class ClassTileState extends State<ClassTile> {
    Animation animation;
    final reference = FirebaseDatabase.instance.reference().child('members');
 
+
    bool userIsMember = false;
 
   ClassTileState(snapshot, animation) {
     GoogleSignIn userInfo = login.getUser();
     this.snapshot = snapshot;
     this.animation = animation;
-    checkIfMember(userInfo.currentUser.id);
+    userIsMember = checkIfMember(userInfo.currentUser.id);
 
   }
 
-   checkIfMember(id) async{
-    var s = await reference.child(snapshot.key).once();
-    Map result = s.value;
-    bool isMem = false;
-
-    if(s.value != null) {
-      result.forEach((k, v){
-        Map p = v;
-         isMem = (p.containsKey(id));
-      });
+   bool checkIfMember(user_id) {
+    Map classMembers = snapshot.value['members'];
+    bool isMem;
+    if(classMembers != null) {
+      isMem = classMembers.containsKey(user_id);
+    }else{
+      isMem = false;
     }
-    setState((){
-      userIsMember = isMem;
-    });
+    return isMem;
   }
 
 
 
 
-  void _joinClass(classId){
+   _joinClass(classId) async{
     GoogleSignIn userInfo = login.getUser();
-    reference.child(classId).push().set({userInfo.currentUser.id : true});
+
+    DatabaseReference classMembers = FirebaseDatabase.instance.reference().child("classes").child(classId).child("members");
+
+    // Needs to be sent to both classes and members because
+    // it is a two way relation and makes it much easier to query both
+
+
+    // push to classes
+    await classMembers.child(userInfo.currentUser.id).set({
+      'user_id' : userInfo.currentUser.id,
+      'username' : userInfo.currentUser.displayName,
+      'photo_url' : userInfo.currentUser.photoUrl
+    });
+
+    // push to members
+    await reference.child(userInfo.currentUser.id).child(classId).set({
+      'name': snapshot.value['name'],
+      'code': snapshot.value['code'],
+      'professor': snapshot.value['professor'],
+      'members' : snapshot.value['members']
+    });
+
+
+    //set state for the check mark system
     setState(() {
         userIsMember = true;
     });
