@@ -61,7 +61,7 @@ class ReplyTileState extends State<ReplyTile> {
 
 
   Widget build(BuildContext context) {
-    return new Column(
+    return new Card(child: new Column(
         children: <Widget>[
           new Row(
               children: <Widget>[
@@ -138,8 +138,9 @@ class ReplyTileState extends State<ReplyTile> {
                                 .subhead),
                       ),
                       new Container(
+
                         margin: const EdgeInsets.only(
-                            left: 10.0, right: 10.0),
+                            left: 10.0, right: 30.0),
                         child: new Text(
                             snapshot.value['content']
                             ,
@@ -166,7 +167,7 @@ class ReplyTileState extends State<ReplyTile> {
 
         ]
 
-    );
+    ));
   }
 
   tryPost(){

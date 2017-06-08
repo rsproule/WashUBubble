@@ -7,7 +7,8 @@ import './loginStuff.dart' as log;
 
 class MainDrawer extends StatefulWidget {
   String currpage = "";
-  MainDrawer(String cp){
+
+  MainDrawer(String cp) {
     this.currpage = cp;
   }
 
@@ -17,7 +18,8 @@ class MainDrawer extends StatefulWidget {
 
 class MainDrawerState extends State<MainDrawer> {
   String currentPage = "";
-  MainDrawerState(String cp){
+
+  MainDrawerState(String cp) {
     this.currentPage = cp;
   }
 
@@ -60,12 +62,13 @@ class MainDrawerState extends State<MainDrawer> {
                   title: new Text("Profile"),
                   selected: currentPage == "Profile",
                   onTap: () {
-
                     Navigator.of(context).pushReplacement(new MaterialPageRoute(
                         builder: (BuildContext context) {
                           return new Scaffold(
-                            appBar: new AppBar(title: new Text("Profile")),
-                            drawer: new _Drawer.MainDrawer("Profile"),
+                              appBar: new AppBar(title: new Text("Profile")),
+                              drawer: new _Drawer.MainDrawer("Profile"),
+                              body: new Center(
+                                  child: new Text("Nother here yet"))
                           );
                         }
                     )
@@ -85,7 +88,9 @@ class MainDrawerState extends State<MainDrawer> {
                         builder: (BuildContext context) {
                           return new Scaffold(
                               drawer: new _Drawer.MainDrawer("Settings"),
-                              appBar: new AppBar(title:  new Text("Settings"))
+                              appBar: new AppBar(title: new Text("Settings")),
+                              body: new Center(
+                                  child: new Text("Nother here yet"))
                           );
                         }
                     )
@@ -100,7 +105,6 @@ class MainDrawerState extends State<MainDrawer> {
                   applicationVersion: "1.0.0",
                   applicationLegalese: "Created by Ryan Sproule"
               ),
-
 
 
             ]

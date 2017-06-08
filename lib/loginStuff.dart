@@ -28,9 +28,6 @@ final auth = FirebaseAuth.instance;
 
   checkLogin() async{
     await  _ensureLoggedIn();
-    //print("ensured: " + googleSignIn.currentUser.toString());
-    //sendDataCallback(googleSignIn);
-
   }
 
   logout() async{
@@ -38,7 +35,6 @@ final auth = FirebaseAuth.instance;
   }
 
   GoogleSignIn getUser(){
-   // checkLogin();
     return googleSignIn;
   }
 

@@ -16,9 +16,11 @@ class MyClassesView extends StatefulWidget {
 
 class MyClassesViewState extends State<MyClassesView> {
 
-  DatabaseReference usersClasses = FirebaseDatabase.instance.reference().child('members');
+  DatabaseReference usersClasses = FirebaseDatabase.instance.reference().child(
+      'members');
   bool isLoaded;
-  MyClassesViewState(){
+
+  MyClassesViewState() {
     isLoaded = false;
     _loadUserInfo();
     //this is being called before the login sequence completes and failing on null
@@ -31,29 +33,28 @@ class MyClassesViewState extends State<MyClassesView> {
 //    return aName.compareTo(bName);
 //  };
 
-  _loadUserInfo() async{
-      await login.checkLogin();
-      GoogleSignIn user = login.getUser();
-      print(user.currentUser);
-      setState((){
-        usersClasses = usersClasses.child(user.currentUser.id);
-        isLoaded = true;
-      });
-
+  _loadUserInfo() async {
+    await login.checkLogin();
+    GoogleSignIn user = login.getUser();
+    setState(() {
+      usersClasses = usersClasses.child(user.currentUser.id);
+      isLoaded = true;
+    });
   }
 
 
   Widget build(BuildContext context) {
     return this.isLoaded
-    ?
+        ?
 
-      new Column(
+    new Column(
         children: <Widget>[
           new Flexible(
               child: new FirebaseAnimatedList(
                   query: usersClasses,
                   defaultChild: new Center(
-                      child: new CircularProgressIndicator()),
+                      child: new CircularProgressIndicator()
+                  ),
                   reverse: false,
                   itemBuilder: (_, DataSnapshot snapshot,
                       Animation<double> animation) {
@@ -68,11 +69,16 @@ class MyClassesViewState extends State<MyClassesView> {
                   }
 
               )
+
           )
         ]
     )
-    : new Center(child: new CircularProgressIndicator(backgroundColor: Colors.orangeAccent))
-
+        : new Center(
+        child:
+        new CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.orangeAccent)
+        )
+    )
     ;
   }
 
@@ -105,7 +111,7 @@ class ClassTileState extends State<ClassTile> {
 
 
   Widget build(BuildContext context) {
-    return  new Column(
+    return new Column(
         children: <Widget>[
           new ListTile(
             title: new Text(snapshot.value['name'], style: Theme
@@ -113,15 +119,14 @@ class ClassTileState extends State<ClassTile> {
                 .textTheme
                 .subhead),
             leading: new Icon(Icons.school),
-            subtitle: new Text(snapshot.value['code'] + " - " + snapshot.value['professor']),
+            subtitle: new Text(
+                snapshot.value['code'] + " - " + snapshot.value['professor']),
             onTap: () {
               Navigator.of(context).push(new MaterialPageRoute(
                   builder: (BuildContext context) {
                     return new Container(
-                      child:  new classPage.ClassPage(snapshot.key)
+                        child: new classPage.ClassPage(snapshot.key)
                     );
-
-
                   }
               )
               );
@@ -130,7 +135,7 @@ class ClassTileState extends State<ClassTile> {
           new Divider()
         ]
 
-    ) ;
+    );
   }
 
 
