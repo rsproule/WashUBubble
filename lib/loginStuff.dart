@@ -15,19 +15,22 @@ final auth = FirebaseAuth.instance;
     if (user == null) {
       await googleSignIn.signIn();
     }
-//    if (auth.currentUser == null) {  //new
-//      GoogleSignInAuthentication credentials =
-//      await googleSignIn.currentUser.authentication;
-//      await auth.signInWithGoogle(
-//        idToken: credentials.idToken,
-//        accessToken: credentials.accessToken,
-//      );
-//    }
+    if (auth.currentUser == null) {  //new
+      GoogleSignInAuthentication credentials =
+      await googleSignIn.currentUser.authentication;
+      await auth.signInWithGoogle(
+        idToken: credentials.idToken,
+        accessToken: credentials.accessToken,
+      );
+    }
 
   }
 
-  checkLogin(){
-    _ensureLoggedIn();
+  checkLogin() async{
+    await  _ensureLoggedIn();
+    //print("ensured: " + googleSignIn.currentUser.toString());
+    //sendDataCallback(googleSignIn);
+
   }
 
   logout() async{
@@ -35,8 +38,12 @@ final auth = FirebaseAuth.instance;
   }
 
   GoogleSignIn getUser(){
-    _ensureLoggedIn();
+   // checkLogin();
     return googleSignIn;
   }
+
+
+
+
 
 

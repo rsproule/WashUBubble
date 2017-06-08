@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './ClassPage.dart' as classPage;
 import './loginStuff.dart' as login;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:async';
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
@@ -16,10 +17,12 @@ class MyClassesView extends StatefulWidget {
 class MyClassesViewState extends State<MyClassesView> {
 
   DatabaseReference usersClasses = FirebaseDatabase.instance.reference().child('members');
-
+  bool isLoaded;
   MyClassesViewState(){
-    GoogleSignInAccount user = login.getUser().currentUser;
-    usersClasses = usersClasses.child(user.id);
+    isLoaded = false;
+    _loadUserInfo();
+    //this is being called before the login sequence completes and failing on null
+
   }
 
 //  Comparator alphabetical = (a, b) {
@@ -28,9 +31,23 @@ class MyClassesViewState extends State<MyClassesView> {
 //    return aName.compareTo(bName);
 //  };
 
+  _loadUserInfo() async{
+      await login.checkLogin();
+      GoogleSignIn user = login.getUser();
+      print(user.currentUser);
+      setState((){
+        usersClasses = usersClasses.child(user.currentUser.id);
+        isLoaded = true;
+      });
+
+  }
+
 
   Widget build(BuildContext context) {
-    return new Column(
+    return this.isLoaded
+    ?
+
+      new Column(
         children: <Widget>[
           new Flexible(
               child: new FirebaseAnimatedList(
@@ -53,7 +70,10 @@ class MyClassesViewState extends State<MyClassesView> {
               )
           )
         ]
-    );
+    )
+    : new Center(child: new CircularProgressIndicator(backgroundColor: Colors.orangeAccent))
+
+    ;
   }
 
 }
