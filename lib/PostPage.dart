@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import './loginStuff.dart' as login;
 import './ReplyTile.dart' as replyTile;
+import './Thread.dart' as thread;
 
 
 class PostPage extends StatefulWidget {
@@ -32,8 +32,8 @@ class PostPageState extends State<PostPage> {
   PostPageState(DataSnapshot s) {
     this.postSnapshot = s;
 
-    _getThreads(replyReference.child(
-        this.postSnapshot.key)); //all the replies in this post
+    // _getThreads(replyReference.child(
+    //     this.postSnapshot.key)); //all the replies in this post
   }
 
   _getThreads(DatabaseReference ref) async {
@@ -47,7 +47,7 @@ class PostPageState extends State<PostPage> {
         replyTile.ReplyTile childTile;
         if (v['parent'] == this.postSnapshot.key) {
           childTile = new replyTile.ReplyTile(
-              snap, animation1, this.postSnapshot.key);
+              snap, animation1, this.postSnapshot.key, 0);
 
           newTiles.add(childTile);
           newTiles.add(new Divider());
@@ -244,22 +244,12 @@ class PostPageState extends State<PostPage> {
 
 
               //All the root thread nodes for this post:
-              new Container(
-                  padding: const EdgeInsets.only(top: 50.0),
-                  child: new ListView(
+              new thread.Thread(postKey: this.postSnapshot.key)
 
-                      children: this.threadTiles.length != 0
-                          ? this.threadTiles
-                          : <Widget>[
-                        new Center(
-                            child: new Padding(
-                                padding: const EdgeInsets.all(40.0),
-                                child: new Text("Be the first to Respond")
-                            )
-                        )
-                      ]
-                  )
-              )
+//              new Container(
+//                  padding: const EdgeInsets.only(top: 50.0),
+//                  child:
+//              )
             ]
         )
     );

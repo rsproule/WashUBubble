@@ -8,15 +8,18 @@ class ReplyTile extends StatefulWidget {
   DataSnapshot snapshot;
   Animation a;
   String postKey;
+  int depthLevel;
 
-  ReplyTile(DataSnapshot s, Animation a, String parent) {
+  ReplyTile(DataSnapshot s, Animation a, String parent, int level) {
     this.snapshot = s;
     this.a = a;
     this.postKey = parent;
+    this.depthLevel = level;
   }
 
   @override
-  ReplyTileState createState() => new ReplyTileState(snapshot, a, postKey);
+  ReplyTileState createState() =>
+      new ReplyTileState(snapshot, a, postKey, depthLevel);
 }
 
 class ReplyTileState extends State<ReplyTile> {
@@ -28,9 +31,14 @@ class ReplyTileState extends State<ReplyTile> {
   List<String> threadChildren = [];
   List<ReplyTile> childrenTiles = [];
   bool hasChildren;
+  int depthLevel;
+
+//  double leftMarginWidth;
 
 
-  ReplyTileState(DataSnapshot s, Animation a, String postKey) {
+  ///constructor:
+  ReplyTileState(DataSnapshot s, Animation a, String postKey, int level) {
+    this.depthLevel = level;
     this.snapshot = s;
     this.animation = a;
     this.postKey = postKey;
@@ -48,10 +56,12 @@ class ReplyTileState extends State<ReplyTile> {
     });
   }
 
+
   getChildren(DatabaseReference ref) async {
     DataSnapshot s = await ref.once();
     Animation<double> animation1;
-    ReplyTile childTile = new ReplyTile(s, animation1, this.postKey);
+    ReplyTile childTile = new ReplyTile(
+        s, animation1, this.postKey, this.depthLevel + 1);
     this.childrenTiles.add(childTile);
     setState(() {
       this.childrenTiles = childrenTiles;
@@ -61,132 +71,153 @@ class ReplyTileState extends State<ReplyTile> {
 
 
   Widget build(BuildContext context) {
-    return new Card(child: new Column(
-        children: <Widget>[
-          new Row(
-              children: <Widget>[
-                new Container(
-                    child: new IconButton(
-                        icon: new Icon(Icons.reply),
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              child: new Dialog(
-                                child: new Row(
-                                    children: <Widget>[
-                                      new Flexible(
-                                          child: new TextField(
-                                              onChanged: (String val) {
+    return new SizeTransition(
+        sizeFactor: new CurvedAnimation(
+            parent: animation, curve: Curves.easeOut),
+        axisAlignment: 0.0,
+
+        child: new Card(
+            elevation: 1.0,
+
+            child: new Column(
+
+                children: <Widget>[
+                  new Row(
+                      children: <Widget>[
+                        new Container(
+                            child: new IconButton(
+                                icon: new Icon(Icons.reply),
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      child: new Dialog(
+                                        child: new Row(
+                                            children: <Widget>[
+                                              new Flexible(
+                                                  child: new TextField(
+                                                      onChanged: (String val) {
 //                                                setState(() {
 //                                                  replyIsFilled =
 //                                                      val != "";
 //                                                });
-                                              },
-                                              controller: replyController,
-                                              maxLines: 10,
-                                              decoration: new InputDecoration(
-                                                  hideDivider: true,
-                                                  hintText: "Add a Response",
-                                                  icon: new Icon(
-                                                      Icons.reply)
+                                                      },
+                                                      controller: replyController,
+                                                      maxLines: 10,
+                                                      decoration: new InputDecoration(
+                                                          hideDivider: true,
+                                                          hintText: "Add a Response",
+                                                          icon: new Icon(
+                                                              Icons.reply)
+                                                      )
+                                                  )
+                                              ),
+
+                                              new MaterialButton(
+                                                  child: new Text("Reply"),
+                                                  splashColor: Colors.blue,
+                                                  textColor: Colors.blue,
+                                                  onPressed: () {
+                                                    if (tryPost()) {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    } else {
+                                                      print("failed to post");
+                                                    }
+                                                  }
+
                                               )
-                                          )
-                                      ),
-
-                                      new MaterialButton(
-                                          child: new Text("Reply"),
-                                          splashColor: Colors.blue,
-                                          textColor: Colors.blue,
-                                          onPressed: () {
-                                            if (tryPost()) {
-                                              Navigator.of(context).pop();
-                                            } else {
-                                              print("failed to post");
-                                            }
-                                          }
-
+                                            ]
+                                        ),
                                       )
-                                    ]
-                                ),
+                                  );
+                                }
+                            )
+
+                        ),
+                        new Container(
+                            margin: const EdgeInsets.only(
+                                right: 10.0, top: 10.0, bottom: 10.0),
+                            child: snapshot.value['photo_url'] !=
+                                null
+                                ? new GoogleUserCircleAvatar(
+                                snapshot.value['photo_url']
+                            ) :
+                            new CircleAvatar(child: new Text("?"))
+                        ),
+
+                        new Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              new Container(
+                                margin: const EdgeInsets.only(
+                                    left: 10.0, right: 10.0),
+                                child: new Text(
+                                    snapshot.value['username'],
+                                    style: Theme
+                                        .of(context)
+                                        .textTheme
+                                        .subhead),
+                              ),
+                              new Container(
+                                  width: 300.0 -
+                                      (this.depthLevel.toDouble() * 30.0),
+                                  child: new Text(snapshot.value['content']
+                                      ,
+                                      style: Theme
+                                          .of(context)
+                                          .textTheme
+                                          .caption)
                               )
-                          );
-                        }
-                    )
 
-                ),
-                new Container(
-                    margin: const EdgeInsets.only(
-                        right: 10.0, top: 10.0, bottom: 10.0),
-                    child: snapshot.value['photo_url'] !=
-                        null
-                        ? new GoogleUserCircleAvatar(
-                        snapshot.value['photo_url']
-                    ) :
-                    new CircleAvatar(child: new Text("?"))
-                ),
-                new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Container(
-                        margin: const EdgeInsets.only(
-                            left: 10.0, right: 10.0),
-                        child: new Text(
-                            snapshot.value['username'],
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .subhead),
-                      ),
-                      new Container(
 
-                        margin: const EdgeInsets.only(
-                            left: 10.0, right: 30.0),
-                        child: new Text(
-                            snapshot.value['content']
-                            ,
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .caption),
-                      ),
+//                            width: 180.0,
+//                            margin: const EdgeInsets.only(
+//                                left: 10.0, right: 30.0),
+//                            child: new Text(
+//                                snapshot.value['content']
+//                                ,
+//                                style: Theme
+//                                    .of(context)
+//                                    .textTheme
+//                                    .caption),
+//                          ),
 
-                    ]
-                ),
+                            ]
+                        ),
 
-              ]
-          ),
+                      ]
+                  ),
 //          new Divider(),
-          this.hasChildren
+                  this.hasChildren
 
-              ? new Container(
-              margin: const EdgeInsets.only(left: 20.0),
-              child: new Column(children: childrenTiles)
-          )
-              : new Container()
+                      ? new Container(
+                      margin: const EdgeInsets.only(left: 20.0),
+                      child: new Column(children: childrenTiles)
+                  )
+                      : new Container()
 
 
-        ]
+                ]
 
-    ));
+            )));
   }
 
-  tryPost(){
+  tryPost() {
     String content = replyController.text;
 
-    if(content == ""){
+    if (content == "") {
       return false;
-    }else{
+    } else {
       _sendReply();
       return true;
     }
   }
 
   _sendReply() async {
-
-    threadInPostReference = FirebaseDatabase.instance.reference().child("threadNodes").child(
+    threadInPostReference =
+        FirebaseDatabase.instance.reference().child("threadNodes").child(
             this.postKey); // the post container
     String content = replyController.text;
-
 
 
     GoogleSignInAccount user = login
@@ -208,11 +239,10 @@ class ReplyTileState extends State<ReplyTile> {
     });
 
 
-
     Map newChildren = snapshot.value['children'];
-    newChildren.putIfAbsent(newKey, ()=>true);
+    newChildren.putIfAbsent(newKey, () => true);
     newChildren.remove("hasChildren");
-    newChildren.putIfAbsent("hasChildren", ()=>true);
+    newChildren.putIfAbsent("hasChildren", () => true);
 
 
     //update the parents children
