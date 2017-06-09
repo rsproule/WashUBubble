@@ -71,12 +71,14 @@ class ReplyTileState extends State<ReplyTile> {
 
 
   Widget build(BuildContext context) {
-    return new SizeTransition(
-        sizeFactor: new CurvedAnimation(
-            parent: animation, curve: Curves.easeOut),
-        axisAlignment: 0.0,
-
-        child: new Card(
+    return
+//      new SizeTransition(
+//        sizeFactor: new CurvedAnimation(
+//            parent: animation, curve: Curves.easeOut),
+//        axisAlignment: 0.0,
+//
+//        child:
+      new Card(
             elevation: 1.0,
 
             child: new Column(
@@ -199,7 +201,7 @@ class ReplyTileState extends State<ReplyTile> {
 
                 ]
 
-            )));
+            ));
   }
 
   tryPost() {

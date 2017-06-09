@@ -44,29 +44,25 @@ class _ThreadState extends State<Thread> {
                       AsyncSnapshot<DataSnapshot> snap) {
                     switch (snap.connectionState) {
                       case ConnectionState.none:
-                        return new Text('Connecting...');
+                        return new Center(
+                            child: new CircularProgressIndicator());
                       case ConnectionState.waiting:
-                        return new Text('Loading...');
+                        return new Center(
+                            child: new CircularProgressIndicator());
                       default:
                         if (!snap.hasData) {
                           return new Text('Error: ${snap.error}');
                         }
                         else {
                           //check if this snap is a root node
-                          Map m = snap.data.value['children'];
-                          bool isRoot = false;
-                          m.forEach((k, v) {
-                            if (k == 'hasChildren') {
-                              isRoot = v;
-                            }
-                          });
+                          String parent = snap.data.value['parent'];
 
-                          if (isRoot) {
+                          if (parent == this.postKey) {
                             return new replyTile.ReplyTile(
                                 snap.data, animation, this.postKey, 0);
+                          } else {
+                            return new Container();
                           }
-
-                          //return new Text("here determine if a root or not, display if root");
 
                         }
                     }
