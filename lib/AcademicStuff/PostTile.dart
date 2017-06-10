@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import './PostPage.dart' as post;
+import 'package:wububble/AcademicStuff/PostPage.dart' as post;
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';

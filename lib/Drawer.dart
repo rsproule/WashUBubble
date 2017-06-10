@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import './main.dart' as main;
 import './Drawer.dart' as _Drawer;
 import 'package:google_sign_in/google_sign_in.dart';
-import './loginStuff.dart' as log;
+import 'package:wububble/AcademicStuff/loginStuff.dart' as log;
 
 
 class MainDrawer extends StatefulWidget {

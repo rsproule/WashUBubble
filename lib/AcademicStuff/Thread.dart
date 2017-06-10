@@ -5,7 +5,7 @@ import 'package:firebase_database/ui/firebase_sorted_list.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
 import './loginStuff.dart' as login;
-import './ReplyTile.dart' as replyTile;
+import 'package:wububble/AcademicStuff/ReplyTile.dart' as replyTile;
 //import './StatelessReplyTile.dart' as reply;
 
 
