@@ -124,6 +124,7 @@ class Message extends StatelessWidget {
   Message({this.snapshot, this.animation});
 
   Widget build(BuildContext context) {
+    print(animation);
     return new SizeTransition(
 
       sizeFactor: new CurvedAnimation(
@@ -155,10 +156,10 @@ class Message extends StatelessWidget {
                               .size
                               .width - 125.0,
                           child: new Text(snapshot.value['message'],
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .body1,
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .body1,
                           )
                       ),
                     ]

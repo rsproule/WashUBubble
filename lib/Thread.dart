@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:firebase_database/ui/firebase_sorted_list.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
 import './loginStuff.dart' as login;
 import './ReplyTile.dart' as replyTile;
+//import './StatelessReplyTile.dart' as reply;
 
 
 class Thread extends StatefulWidget {
@@ -16,6 +19,8 @@ class Thread extends StatefulWidget {
 }
 
 class _ThreadState extends State<Thread> {
+  int height;
+
   final String postKey;
   DatabaseReference ref = FirebaseDatabase.instance.reference().child(
       'threadNodes');
@@ -29,15 +34,15 @@ class _ThreadState extends State<Thread> {
         padding: const EdgeInsets.only(top: 50.0),
 
         /// here to allow the user to scroll back up to the post page
+        /// gotta be a better way to do this
+
         child: new FirebaseAnimatedList(
+
             defaultChild: new DefaultThreadView(),
             query: ref.child(postKey),
             sort: (a, b) => (a.key.compareTo(b.key)),
             itemBuilder: (context, DataSnapshot snapshot,
                 Animation<double> animation) {
-              Map m = snapshot.value;
-//            print("Map: " + m.toString());
-//            print("Key: " + snapshot.key);
               return new FutureBuilder<DataSnapshot>(
                   future: ref.child(postKey).child(snapshot.key).once(),
                   builder: (BuildContext context,
@@ -63,7 +68,6 @@ class _ThreadState extends State<Thread> {
                           } else {
                             return new Container();
                           }
-
                         }
                     }
                   }
@@ -81,7 +85,7 @@ class _ThreadState extends State<Thread> {
 
 class DefaultThreadView extends StatefulWidget {
   String postKey;
-
+  ListView l;
   DefaultThreadView({this.postKey});
 
   @override

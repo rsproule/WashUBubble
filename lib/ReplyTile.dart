@@ -33,8 +33,6 @@ class ReplyTileState extends State<ReplyTile> {
   bool hasChildren;
   int depthLevel;
 
-//  double leftMarginWidth;
-
 
   ///constructor:
   ReplyTileState(DataSnapshot s, Animation a, String postKey, int level) {
@@ -59,149 +57,144 @@ class ReplyTileState extends State<ReplyTile> {
 
   getChildren(DatabaseReference ref) async {
     DataSnapshot s = await ref.once();
-    Animation<double> animation1;
+//    Animation<double> animation1;
     ReplyTile childTile = new ReplyTile(
-        s, animation1, this.postKey, this.depthLevel + 1);
+        s, animation, this.postKey, this.depthLevel + 1);
     this.childrenTiles.add(childTile);
-    setState(() {
-      this.childrenTiles = childrenTiles;
-    });
+    if (mounted) {
+      setState(() {
+        this.childrenTiles = childrenTiles;
+      });
+    } else {
+      print(s.key + " is not mounted");
+    }
 //    print(s.value['content']);
   }
 
 
   Widget build(BuildContext context) {
+    print(snapshot.key + animation.toString());
     return
-//      new SizeTransition(
-//        sizeFactor: new CurvedAnimation(
-//            parent: animation, curve: Curves.easeOut),
-//        axisAlignment: 0.0,
-//
-//        child:
-      new Card(
-            elevation: 1.0,
+      new SizeTransition(
+          sizeFactor: new CurvedAnimation(
+              parent: this.animation, curve: Curves.easeOut),
+          axisAlignment: 0.0,
 
-            child: new Column(
+          child:
+          new Card(
+              elevation: 1.0,
 
-                children: <Widget>[
-                  new Row(
-                      children: <Widget>[
-                        new Container(
-                            child: new IconButton(
-                                icon: new Icon(Icons.reply),
-                                onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      child: new Dialog(
-                                        child: new Row(
-                                            children: <Widget>[
-                                              new Flexible(
-                                                  child: new TextField(
-                                                      onChanged: (String val) {
+              child: new Column(
+
+                  children: <Widget>[
+                    new Row(
+                        children: <Widget>[
+                          new Container(
+                              child: new IconButton(
+                                  icon: new Icon(Icons.reply),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        child: new Dialog(
+                                          child: new Row(
+                                              children: <Widget>[
+                                                new Flexible(
+                                                    child: new TextField(
+                                                        onChanged: (String val) {
 //                                                setState(() {
 //                                                  replyIsFilled =
 //                                                      val != "";
 //                                                });
-                                                      },
-                                                      controller: replyController,
-                                                      maxLines: 10,
-                                                      decoration: new InputDecoration(
-                                                          hideDivider: true,
-                                                          hintText: "Add a Response",
-                                                          icon: new Icon(
-                                                              Icons.reply)
-                                                      )
-                                                  )
-                                              ),
+                                                        },
+                                                        controller: replyController,
+                                                        maxLines: 10,
+                                                        decoration: new InputDecoration(
+                                                            hideDivider: true,
+                                                            hintText: "Add a Response",
+                                                            icon: new Icon(
+                                                                Icons.reply)
+                                                        )
+                                                    )
+                                                ),
 
-                                              new MaterialButton(
-                                                  child: new Text("Reply"),
-                                                  splashColor: Colors.blue,
-                                                  textColor: Colors.blue,
-                                                  onPressed: () {
-                                                    if (tryPost()) {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    } else {
-                                                      print("failed to post");
+                                                new MaterialButton(
+                                                    child: new Text("Reply"),
+                                                    splashColor: Colors.blue,
+                                                    textColor: Colors.blue,
+                                                    onPressed: () {
+                                                      if (tryPost()) {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      } else {
+                                                        print("failed to post");
+                                                      }
                                                     }
-                                                  }
 
-                                              )
-                                            ]
-                                        ),
-                                      )
-                                  );
-                                }
-                            )
+                                                )
+                                              ]
+                                          ),
+                                        )
+                                    );
+                                  }
+                              )
 
-                        ),
-                        new Container(
-                            margin: const EdgeInsets.only(
-                                right: 10.0, top: 10.0, bottom: 10.0),
-                            child: snapshot.value['photo_url'] !=
-                                null
-                                ? new GoogleUserCircleAvatar(
-                                snapshot.value['photo_url']
-                            ) :
-                            new CircleAvatar(child: new Text("?"))
-                        ),
+                          ),
+                          new Container(
+                              margin: const EdgeInsets.only(
+                                  right: 10.0, top: 10.0, bottom: 10.0),
+                              child: snapshot.value['photo_url'] !=
+                                  null
+                                  ? new GoogleUserCircleAvatar(
+                                  snapshot.value['photo_url']
+                              ) :
+                              new CircleAvatar(child: new Text("?"))
+                          ),
 
-                        new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              new Container(
-                                margin: const EdgeInsets.only(
-                                    left: 10.0, right: 10.0),
-                                child: new Text(
-                                    snapshot.value['username'],
-                                    style: Theme
-                                        .of(context)
-                                        .textTheme
-                                        .subhead),
-                              ),
-                              new Container(
-                                  width: 300.0 -
-                                      (this.depthLevel.toDouble() * 30.0),
-                                  child: new Text(snapshot.value['content']
-                                      ,
+                          new Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                new Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 10.0, right: 10.0),
+                                  child: new Text(
+                                      snapshot.value['username'],
                                       style: Theme
                                           .of(context)
                                           .textTheme
-                                          .caption)
-                              )
+                                          .subhead),
+                                ),
+                                new Container(
+                                    width: MediaQuery
+                                        .of(context)
+                                        .size
+                                        .width - 120.0 -
+                                        (this.depthLevel.toDouble() * 30.0),
+                                    child: new Text(snapshot.value['content']
+                                        ,
+                                        style: Theme
+                                            .of(context)
+                                            .textTheme
+                                            .caption)
+                                )
 
+                              ]
+                          ),
 
-//                            width: 180.0,
-//                            margin: const EdgeInsets.only(
-//                                left: 10.0, right: 30.0),
-//                            child: new Text(
-//                                snapshot.value['content']
-//                                ,
-//                                style: Theme
-//                                    .of(context)
-//                                    .textTheme
-//                                    .caption),
-//                          ),
-
-                            ]
-                        ),
-
-                      ]
-                  ),
+                        ]
+                    ),
 //          new Divider(),
-                  this.hasChildren
+                    this.hasChildren
 
-                      ? new Container(
-                      margin: const EdgeInsets.only(left: 20.0),
-                      child: new Column(children: childrenTiles)
-                  )
-                      : new Container()
+                        ? new Container(
+                        margin: const EdgeInsets.only(left: 20.0),
+                        child: new Column(children: childrenTiles)
+                    )
+                        : new Container()
 
 
-                ]
+                  ]
 
-            ));
+              )));
   }
 
   tryPost() {
