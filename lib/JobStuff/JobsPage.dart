@@ -1,12 +1,57 @@
 import 'package:flutter/material.dart';
+import './PostNewEventForm.dart' as add;
 
 
-class JobsPage extends StatelessWidget {
+class JobsPage extends StatefulWidget {
+  @override
+  _JobsPageState createState() => new _JobsPageState();
+}
+
+class _JobsPageState extends State<JobsPage>
+    with SingleTickerProviderStateMixin {
+  TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = new TabController(vsync: this, length: 3);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  List<Tab> myTabs = [
+    new Tab(icon: new Icon(Icons.event), text: "Upcoming Events"),
+    new Tab(icon: new Icon(Icons.add_box), text: "Add an Event"),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      backgroundColor: new Color.fromRGBO(210, 213, 219, 1.0),
-      body: new Center(child: new Text("Jobs")),
+    return new Column(
+        children: <Widget>[
+          new TabBar(
+              labelColor: Colors.blue,
+              unselectedLabelColor: Colors.blueGrey,
+              indicatorColor: Colors.blue,
+              controller: _tabController,
+              tabs: myTabs
+          ),
+          new Expanded(
+            child:
+            new TabBarView(
+                controller: _tabController,
+                children: <Widget>[
+                  new Text("upcoming"),
+                  new add.NewEventForm()
+                ]
+            ),)
+
+        ]
+
     );
   }
 }
+
