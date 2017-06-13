@@ -24,8 +24,9 @@ class _JobsPageState extends State<JobsPage>
   }
 
   List<Tab> myTabs = [
-    new Tab(icon: new Icon(Icons.event), text: "Upcoming Events"),
-    new Tab(icon: new Icon(Icons.add_box), text: "Add an Event"),
+    new Tab(icon: new Icon(Icons.star), text: "Starred"),
+    new Tab(icon: new Icon(Icons.event), text: "Upcoming"),
+//    new Tab(icon: new Icon(Icons.add_box), text: "Add an Event"),
   ];
 
   @override
@@ -44,10 +45,29 @@ class _JobsPageState extends State<JobsPage>
             new TabBarView(
                 controller: _tabController,
                 children: <Widget>[
+                  new Text("My flagged events"),
                   new Text("upcoming"),
-                  new add.NewEventForm()
+//                  new add.NewEventForm()
                 ]
-            ),)
+            ),
+          ),
+          new Container(
+              padding: const EdgeInsets.only(right: 25.0, bottom: 25.0),
+              alignment: FractionalOffset.bottomRight,
+              child: new FloatingActionButton(
+                  child: new Icon(Icons.add),
+                  onPressed: () {
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return new add.NewEventForm();
+                        }
+                    )
+                    );
+                  }
+              )
+          ),
+
+
 
         ]
 

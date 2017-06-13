@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -15,26 +16,75 @@ class Thread extends StatefulWidget {
   Thread({this.postKey});
 
   @override
-  _ThreadState createState() => new _ThreadState(postKey: postKey);
+  _ThreadState createState() => new _ThreadState(postKey);
 }
 
 class _ThreadState extends State<Thread> {
   int height;
 
-  final String postKey;
+  String postKey;
   DatabaseReference ref = FirebaseDatabase.instance.reference().child(
       'threadNodes');
 
-  _ThreadState({this.postKey});
+  _ThreadState(String p) {
+    this.postKey = p;
+    //_getThreads();
+  }
+
+  List<replyTile.ReplyTile> cachedThreads;
+  Map cache = new Map();
+  bool isLoaded = false;
+
+
+  _getThreads() async {
+    DataSnapshot snapshot = await ref.child(postKey).once();
+    Map allThreadsMap = snapshot.value;
+    List<replyTile.ReplyTile> cache = [];
+
+    if (allThreadsMap == null) return;
+
+    allThreadsMap.forEach((k, v) async {
+      DataSnapshot thread = await ref.child(postKey).child(k).once();
+      //check if this snap is a root node
+//      Map pr = snapshot.value;
+//      print("the first: " + v.toString());
+      //String parent = threads.value['parent'];
+      Animation<double> animation;
+//      Map t = threads.value;
+
+
+      v.forEach((k1, v1) async {
+        if (v1 == this.postKey) {
+          cache.add(new replyTile.ReplyTile(
+              thread, animation, this.postKey, 0));
+        }
+      });
+    });
+  }
 
 
   @override
   Widget build(BuildContext context) {
     return new Container(
-        padding: const EdgeInsets.only(top: 50.0),
 
-        /// here to allow the user to scroll back up to the post page
-        /// gotta be a better way to do this
+      /// here to allow the user to scroll back up to the post page
+      /// gotta be a better way to do this
+        padding: const EdgeInsets.only(top: 50.0),
+//        child: new ListView(
+//            children: this.isLoaded ?
+//
+//            this.cachedThreads // all cached threads now stored in memory
+//
+//
+//                : <Widget>[
+//              new Center(
+//                  child: new Container(
+//                      padding: const EdgeInsets.only(top: 20.0),
+//                      child: new CircularProgressIndicator()
+//                  )
+//              ),
+//            ]
+//        )
 
         child: new FirebaseAnimatedList(
 
@@ -47,28 +97,45 @@ class _ThreadState extends State<Thread> {
                   future: ref.child(postKey).child(snapshot.key).once(),
                   builder: (BuildContext context,
                       AsyncSnapshot<DataSnapshot> snap) {
-                    switch (snap.connectionState) {
-                      case ConnectionState.none:
-                        return new Center(
-                            child: new CircularProgressIndicator());
-                      case ConnectionState.waiting:
-                        return new Center(
-                            child: new CircularProgressIndicator());
-                      default:
-                        if (!snap.hasData) {
-                          return new Text('Error: ${snap.error}');
-                        }
-                        else {
-                          //check if this snap is a root node
-                          String parent = snap.data.value['parent'];
-
-                          if (parent == this.postKey) {
-                            return new replyTile.ReplyTile(
-                                snap.data, animation, this.postKey, 0);
-                          } else {
-                            return new Container();
+                    Future<DataSnapshot> s = ref.child(postKey).child(
+                        snapshot.key).once();
+//                    print(cache.length);
+                    if (cache.containsKey(snapshot.key)) {
+//                        print("loaded from cache");
+                      return cache[snapshot.key];
+                    }
+                    else {
+                      switch (snap.connectionState) {
+                        case ConnectionState.none:
+                          return new Center(
+                              child: new CircularProgressIndicator());
+                        case ConnectionState.waiting:
+                          return new Center(
+                              child: new CircularProgressIndicator());
+                        default:
+                          if (!snap.hasData) {
+                            return new Text('Error: ${snap.error}');
                           }
-                        }
+                          else {
+                            //check if this snap is a root node
+                            String parent = snap.data.value['parent'];
+
+                            if (parent == this.postKey) {
+//                              print("new load");
+                              replyTile.ReplyTile thread = new replyTile
+                                  .ReplyTile(
+                                  snap.data, animation, this.postKey, 0);
+
+                              cache.putIfAbsent(snapshot.key, () => thread);
+                              print(thread);
+
+
+                              return thread;
+                            } else {
+                              return new Container();
+                            }
+                          }
+                      }
                     }
                   }
               );
@@ -86,6 +153,7 @@ class _ThreadState extends State<Thread> {
 class DefaultThreadView extends StatefulWidget {
   String postKey;
   ListView l;
+
   DefaultThreadView({this.postKey});
 
   @override

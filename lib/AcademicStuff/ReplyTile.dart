@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -36,6 +37,7 @@ class ReplyTileState extends State<ReplyTile> {
 
   ///constructor:
   ReplyTileState(DataSnapshot s, Animation a, String postKey, int level) {
+    print("constructor");
     this.depthLevel = level;
     this.snapshot = s;
     this.animation = a;
@@ -49,18 +51,24 @@ class ReplyTileState extends State<ReplyTile> {
         DatabaseReference ref = FirebaseDatabase.instance.reference().child(
             "threadNodes")
             .child(postKey).child(k);
-        getChildren(ref);
+
+        getChildren(ref, k);
       }
     });
   }
 
 
-  getChildren(DatabaseReference ref) async {
-    DataSnapshot s = await ref.once();
+  getChildren(DatabaseReference ref, String k) async {
+    Future<DataSnapshot> future = ref.once();
+
+
+    DataSnapshot s = await future;
 //    Animation<double> animation1;
     ReplyTile childTile = new ReplyTile(
         s, animation, this.postKey, this.depthLevel + 1);
+
     this.childrenTiles.add(childTile);
+
     if (mounted) {
       setState(() {
         this.childrenTiles = childrenTiles;
@@ -73,7 +81,7 @@ class ReplyTileState extends State<ReplyTile> {
 
 
   Widget build(BuildContext context) {
-    print(snapshot.key + animation.toString());
+//    print(snapshot.key + animation.toString());
     return
       new SizeTransition(
           sizeFactor: new CurvedAnimation(
@@ -264,7 +272,7 @@ class ReplyTileState extends State<ReplyTile> {
         DatabaseReference ref = FirebaseDatabase.instance.reference().child(
             "threadNodes")
             .child(postKey).child(k);
-        getChildren(ref);
+        getChildren(ref, k);
       }
     });
   }
