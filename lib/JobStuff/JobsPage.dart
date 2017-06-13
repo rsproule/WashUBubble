@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import './PostNewEventForm.dart' as add;
+import './UpcomingPage.dart' as upcoming;
+import './StarredPage.dart' as star;
 
 
 class JobsPage extends StatefulWidget {
@@ -45,8 +47,8 @@ class _JobsPageState extends State<JobsPage>
             new TabBarView(
                 controller: _tabController,
                 children: <Widget>[
-                  new Text("My flagged events"),
-                  new Text("upcoming"),
+                  new star.StarredEventsPage(),
+                  new upcoming.UpcomingPage()
 //                  new add.NewEventForm()
                 ]
             ),
