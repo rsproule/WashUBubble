@@ -26,8 +26,8 @@ class _JobsPageState extends State<JobsPage>
   }
 
   List<Tab> myTabs = [
-    new Tab(icon: new Icon(Icons.star), text: "Starred"),
     new Tab(icon: new Icon(Icons.event), text: "Upcoming"),
+    new Tab(icon: new Icon(Icons.star), text: "Starred"),
 //    new Tab(icon: new Icon(Icons.add_box), text: "Add an Event"),
   ];
 
@@ -47,8 +47,9 @@ class _JobsPageState extends State<JobsPage>
             new TabBarView(
                 controller: _tabController,
                 children: <Widget>[
+                  new upcoming.UpcomingPage(),
                   new star.StarredEventsPage(),
-                  new upcoming.UpcomingPage()
+
 //                  new add.NewEventForm()
                 ]
             ),
@@ -68,7 +69,6 @@ class _JobsPageState extends State<JobsPage>
                   }
               )
           ),
-
 
 
         ]
