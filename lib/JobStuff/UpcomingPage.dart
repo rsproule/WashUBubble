@@ -34,7 +34,12 @@ class _UpcomingPageState extends State<UpcomingPage> {
           sort: byTime,
         itemBuilder: (context, DataSnapshot snapshot,
             Animation<double> animation) {
-          return new event.EventTile(animation: animation, snapshot: snapshot);
+          if (new DateTime.now()
+              .difference(DateTime.parse(snapshot.value['date']))
+              .inMinutes < 0) {
+            return new event.EventTile(
+                animation: animation, snapshot: snapshot);
+          }
         }
 
     );

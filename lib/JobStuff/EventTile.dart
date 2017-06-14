@@ -25,11 +25,11 @@ class _EventTileState extends State<EventTile> {
 
   @override
   Widget build(BuildContext context) {
-    String eventDateReadable = _convertDateStringReadable(
+    String eventDateReadable = _convertDateStringToReadable(
         snapshot.value['date']);
-    DateTime timeOfStartOfEvent = _convertTimeInfo(
+    DateTime timeOfStartOfEvent = _convertTimeInfoToDateTimeObj(
         snapshot.value['date'], snapshot.value['start_time']);
-    DateTime timeOfEndOfEvent = _convertTimeInfo(
+    DateTime timeOfEndOfEvent = _convertTimeInfoToDateTimeObj(
         snapshot.value['date'], snapshot.value['end_time']);
     DateTime now = new DateTime.now();
 
@@ -38,37 +38,146 @@ class _EventTileState extends State<EventTile> {
         .inMinutes;
 
 
-    if (now
-        .difference(timeOfEndOfEvent)
-        .inMinutes < 0) {
-      return new Card(
-          child: new Column(
-              children: <Widget>[
-                new Text(snapshot.value['name']),
-                new Text(snapshot.value['group_name']),
-                new Text(snapshot.value['location']),
-                new Text(eventDateReadable),
-                new Text(snapshot.value['description']),
-                new Text(snapshot.value['food_type']),
-//                timeTillEvent < 60
-                //     ?
-                new Text("Time till event starts: " + timeTillEvent.toString() +
-                    " minutes"),
-                //   : new Container(),
+    return new Card(
+        child: new Column(
+            children: <Widget>[
 
-                new Text(snapshot.value['start_time'] + " - " +
-                    snapshot.value['end_time']),
+              new Row(
+                  children: <Widget>[
 
-              ]
-          )
-      );
-    } else {
-      return new Container();
-    }
+                    new IconButton(
+                        icon: new Icon(Icons.star), onPressed: _addToStarred),
+                    new Expanded(
+                      child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            new Container(
+                              padding: const EdgeInsets.only(left: 10.0),
+                              child: new Text(
+                                  snapshot.value['name'], style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .title),
+                            ),
+                            new Container(
+                              padding: const EdgeInsets.only(left: 10.0),
+                              child: new Text(
+                                  snapshot.value['group_name'], style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .subhead),
+                            ),
+                          ]
+                      ),
+                    ),
+
+
+                    new Expanded(
+                      child: new Container(
+                        padding: const EdgeInsets.only(right: 10.0),
+                        alignment: FractionalOffset.topRight,
+                        child: new Column(
+                            children: <Widget>[
+                              new Text(eventDateReadable),
+                              timeTillEvent <
+                                  60 //only show the countdown when within the hour
+                                  ? new Text(
+                                  "Starts in " + timeTillEvent.toString() +
+                                      " minutes",
+                                  style: new TextStyle(color: Colors.red))
+                                  : new Text(" "),
+
+
+                            ]
+                        ),
+
+                      ),
+                    )
+
+
+                  ]
+              ),
+
+              new Container(
+                padding: const EdgeInsets.all(4.0),
+                child: new Image.network(
+                    "https://wallpaperbrowse.com/media/images/8DJWnR85.jpg",
+                    height: 380.0,
+                    width: 400.0
+                ),
+              ),
+              new Row(
+                  children: <Widget>[
+                    new Expanded(
+                      child: new Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            new Row(
+                                children: <Widget>[
+                                  new Icon(Icons.location_on),
+                                  new Text(snapshot.value['location']),
+                                ]
+                            ),
+                            new Divider(color: Colors.transparent),
+                            new Row(
+                                children: <Widget>[
+                                  new Icon(Icons.timer),
+                                  new Text(
+                                      snapshot.value['start_time'] + " - " +
+                                          snapshot.value['end_time']),
+                                ]
+                            ),
+                            new Divider(color: Colors.transparent)
+
+                          ]
+                      ),
+                    ),
+                    new Expanded(
+                      child: new Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            new Row(
+                                children: <Widget>[
+                                  new Icon(Icons.fastfood),
+                                  new Text(snapshot.value['food_type']),
+                                ]
+                            ),
+                            new Divider(color: Colors.transparent),
+                            new Row(
+                                children: <Widget>[
+                                  new Icon(Icons.fastfood,
+                                      color: Colors.transparent),
+                                  new Text(" "),
+                                ]
+                            ),
+                            new Divider(color: Colors.transparent)
+
+                          ]
+                      ),
+                    ),
+
+
+                  ]
+              ),
+              new Row(
+                  children: <Widget>[
+                    new Icon(Icons.info_outline),
+                    new Text(snapshot.value['description']),
+                  ]
+              ),
+              new Divider(color: Colors.transparent),
+
+
+            ]
+        )
+    );
   }
 
 
-  String _convertDateStringReadable(String s) {
+  String _convertDateStringToReadable(String s) {
     DateTime d = DateTime.parse(s);
     List<String> months = [
       "January",
@@ -91,7 +200,7 @@ class _EventTileState extends State<EventTile> {
 
   /// raw date can be easily converted to DateTime using parse
   /// start time is a formatted string ie 4:00 p.m.
-  _convertTimeInfo(String rawDate, String startTime) {
+  _convertTimeInfoToDateTimeObj(String rawDate, String startTime) {
     DateTime date = DateTime.parse(rawDate);
     List<String> splitS = startTime.split(':');
     int hour = int.parse(splitS[0]);
@@ -108,4 +217,7 @@ class _EventTileState extends State<EventTile> {
     return dateTime;
   }
 
+
+  void _addToStarred() {
+  }
 }

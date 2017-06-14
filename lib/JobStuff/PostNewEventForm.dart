@@ -234,17 +234,6 @@ class _NewEventFormState extends State<NewEventForm> {
 
               new Divider(),
 
-//          new Container(
-//              child: new Text("Add location", style: Theme.of(context).textTheme.subhead),
-//              padding: const EdgeInsets.only(left: 15.0, top: 15.0)
-//          ),
-//
-//              new Row(
-//                  children: <Widget>[
-//                    new Text("location selecter here")
-//                  ]
-//              ),
-
 
               new Divider(height: 25.0, color: Colors.transparent),
 

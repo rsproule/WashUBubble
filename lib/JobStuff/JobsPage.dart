@@ -64,8 +64,6 @@ class _JobsPageState extends State<JobsPage>
                     children: <Widget>[
                       new upcoming.UpcomingPage(),
                       new star.StarredEventsPage(),
-
-//                  new add.NewEventForm()
                     ]
                 ),
               ),
