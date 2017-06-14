@@ -33,46 +33,47 @@ class _JobsPageState extends State<JobsPage>
 
   @override
   Widget build(BuildContext context) {
-    return new Column(
-        children: <Widget>[
-          new TabBar(
-              labelColor: Colors.blue,
-              unselectedLabelColor: Colors.blueGrey,
-              indicatorColor: Colors.blue,
-              controller: _tabController,
-              tabs: myTabs
-          ),
-          new Expanded(
-            child:
-            new TabBarView(
-                controller: _tabController,
-                children: <Widget>[
-                  new upcoming.UpcomingPage(),
-                  new star.StarredEventsPage(),
+    return new Scaffold(
 
-//                  new add.NewEventForm()
-                ]
-            ),
-          ),
-          new Container(
-              padding: const EdgeInsets.only(right: 25.0, bottom: 25.0),
-              alignment: FractionalOffset.bottomRight,
-              child: new FloatingActionButton(
-                  child: new Icon(Icons.add),
-                  onPressed: () {
-                    Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return new add.NewEventForm();
-                        }
-                    )
-                    );
+        floatingActionButton: new FloatingActionButton(
+            child: new Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return new add.NewEventForm();
                   }
               )
-          ),
+              );
+            }
+        ),
 
 
-        ]
+        body: new Column(
+            children: <Widget>[
+              new TabBar(
+                  labelColor: Colors.blue,
+                  unselectedLabelColor: Colors.blueGrey,
+                  indicatorColor: Colors.blue,
+                  controller: _tabController,
+                  tabs: myTabs
+              ),
+              new Expanded(
+                child:
+                new TabBarView(
+                    controller: _tabController,
+                    children: <Widget>[
+                      new upcoming.UpcomingPage(),
+                      new star.StarredEventsPage(),
 
+//                  new add.NewEventForm()
+                    ]
+                ),
+              ),
+
+
+            ]
+
+        )
     );
   }
 }

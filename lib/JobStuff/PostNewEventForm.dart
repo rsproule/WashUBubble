@@ -390,6 +390,8 @@ class _NewEventFormState extends State<NewEventForm> {
       isValid = false;
     }
 
+    this.day = new DateTime(this.day.year, this.day.day, this.startTime.hour,
+        this.startTime.minute);
     String date = this.day
         .toString(); // convert back back with DateTime.parse()
     String startTime = this.startTime.toString();

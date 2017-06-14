@@ -187,8 +187,22 @@ class PostQuestionState extends State<PostQuestion>{
     //get current time, sadly had to make a months array
     DateTime d = new DateTime.now();
     TimeOfDay t = new TimeOfDay.now();
-     List<String> months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-     String timestamp =  months[d.month-1] + " " + d.day.toString() + ", " +  d.year.toString() + " " + t.toString();
+    List<String> months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+    String timestamp = months[d.month - 1] + " " + d.day.toString() + ", " +
+        d.year.toString() + " " + t.toString();
 
 
      if(fieldsFilled) {
