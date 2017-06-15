@@ -68,12 +68,15 @@ PODS:
   - GTMSessionFetcher/Core (1.1.10)
   - GTMSessionFetcher/Full (1.1.10):
     - GTMSessionFetcher/Core (= 1.1.10)
+  - image_picker (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - firebase_auth (from `/Users/ryansproule/.pub-cache/hosted/pub.dartlang.org/firebase_auth-0.0.2+1/ios`)
   - firebase_database (from `/Users/ryansproule/.pub-cache/hosted/pub.dartlang.org/firebase_database-0.0.4/ios`)
   - Flutter (from `/Users/ryansproule/Documents/flutter/bin/cache/artifacts/engine/ios`)
   - google_sign_in (from `/Users/ryansproule/.pub-cache/hosted/pub.dartlang.org/google_sign_in-0.0.2/ios`)
+  - image_picker (from `/Users/ryansproule/.pub-cache/hosted/pub.dartlang.org/image_picker-0.0.2+2/ios`)
 
 EXTERNAL SOURCES:
   firebase_auth:
@@ -84,6 +87,8 @@ EXTERNAL SOURCES:
     :path: /Users/ryansproule/Documents/flutter/bin/cache/artifacts/engine/ios
   google_sign_in:
     :path: /Users/ryansproule/.pub-cache/hosted/pub.dartlang.org/google_sign_in-0.0.2/ios
+  image_picker:
+    :path: /Users/ryansproule/.pub-cache/hosted/pub.dartlang.org/image_picker-0.0.2+2/ios
 
 SPEC CHECKSUMS:
   Firebase: 4b66b5b59c43edac745b87f0c87e42cdd0279c13
@@ -102,6 +107,7 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
   GTMOAuth2: 7fc9c10f5c745f4d9850419ea88889fe3baa6b7d
   GTMSessionFetcher: 30d874b96d0d76028f61fbd122801e3f030d47db
+  image_picker: a211f28b95a560433c00f5cd3773f4710a20404d
 
 PODFILE CHECKSUM: a78b8e5144ee1c29ebd4ae3dd89610f3d20e8b16
 

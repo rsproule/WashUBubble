@@ -30,16 +30,17 @@ class _UpcomingPageState extends State<UpcomingPage> {
 
       new FirebaseAnimatedList(
         query: events,
-        defaultChild: new Text("Loading..."),
+          defaultChild: new Center(child: new CircularProgressIndicator()),
           sort: byTime,
         itemBuilder: (context, DataSnapshot snapshot,
             Animation<double> animation) {
-          if (new DateTime.now()
-              .difference(DateTime.parse(snapshot.value['date']))
-              .inMinutes < 0) {
+//          if (new DateTime.now()
+//              .difference(DateTime.parse(snapshot.value['date']))
+//              .inMinutes < 0) {
+
             return new event.EventTile(
                 animation: animation, snapshot: snapshot);
-          }
+//          }
         }
 
     );

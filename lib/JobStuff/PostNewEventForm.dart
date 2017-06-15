@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../AcademicStuff/loginStuff.dart' as login;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewEventForm extends StatefulWidget {
   @override
@@ -10,9 +12,19 @@ class NewEventForm extends StatefulWidget {
 }
 
 class _NewEventFormState extends State<NewEventForm> {
-  List<String> months = ["January", "February",
-  "March", "April", "May", "June", "July", "August",
-  "September", "October", "November", "December"
+  List<String> months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
   ];
 
   DateTime day = new DateTime.now();
@@ -25,6 +37,8 @@ class _NewEventFormState extends State<NewEventForm> {
   TextEditingController _foodController = new TextEditingController();
   TextEditingController _descriptionController = new TextEditingController();
   TextEditingController _locationController = new TextEditingController();
+  File imageFile;
+
   bool nameHasError = false;
   bool groupHasError = false;
   bool foodHasError = false;
@@ -113,7 +127,7 @@ class _NewEventFormState extends State<NewEventForm> {
                 new Row(children: <Widget>[
 
                   new Container(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.all(10.0),
                       child:
                       new Column(
                           children: <Widget>[
@@ -151,7 +165,7 @@ class _NewEventFormState extends State<NewEventForm> {
                   ),
 
                   new Container(
-                    padding: const EdgeInsets.only(left: 45.0),
+                    padding: const EdgeInsets.only(left: 25.0),
                     child:
                     new Column(
                         children: <Widget>[
@@ -164,9 +178,11 @@ class _NewEventFormState extends State<NewEventForm> {
                                       initialTime: this.startTime
                                   ).then((startTime) {
                                     if (startTime != null) {
-                                      setState(() {
-                                        this.startTime = startTime;
-                                      });
+                                      if (this.mounted) {
+                                        setState(() {
+                                          this.startTime = startTime;
+                                        });
+                                      }
                                     }
                                   });
                                 }
@@ -232,7 +248,25 @@ class _NewEventFormState extends State<NewEventForm> {
                   )
               ),
 
+
               new Divider(),
+
+              imageFile == null
+                  ? new Column(children: <Widget>[
+                new IconButton(
+                    icon: new Icon(Icons.add_a_photo),
+                    onPressed: _getImage,
+                    tooltip: "Add Image"
+                ),
+                new Text("Add a photo")
+              ]
+              )
+
+
+                  : new Container(
+                padding: const EdgeInsets.all(4.0),
+                child: new Image.file(imageFile),
+              ),
 
 
               new Divider(height: 25.0, color: Colors.transparent),
@@ -379,9 +413,10 @@ class _NewEventFormState extends State<NewEventForm> {
       isValid = false;
     }
 
-    this.day = new DateTime(this.day.year, this.day.day, this.startTime.hour,
+    DateTime d = new DateTime(
+        this.day.year, this.day.month, this.day.day, this.startTime.hour,
         this.startTime.minute);
-    String date = this.day
+    String date = d
         .toString(); // convert back back with DateTime.parse()
     String startTime = this.startTime.toString();
     String endTime = this.endTime.toString();
@@ -457,4 +492,14 @@ class _NewEventFormState extends State<NewEventForm> {
     );
   }
 
+
+  _getImage() async {
+    Future<File> f = ImagePicker.pickImage();
+    f.then((image) =>
+    this.mounted ?
+    setState(() {
+      imageFile = image;
+    }) : null
+    ).catchError((error) => print("ERROR IN IMAGE UPLOAD" + error));
+  }
 }
