@@ -27,11 +27,6 @@ class MyClassesViewState extends State<MyClassesView> {
 
   }
 
-//  Comparator alphabetical = (a, b) {
-//    String aName = a.value['name'];
-//    String bName = b.value['name'];
-//    return aName.compareTo(bName);
-//  };
 
   _loadUserInfo() async {
     await login.checkLogin();

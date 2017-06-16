@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../AcademicStuff/loginStuff.dart' as login;
-import 'package:google_sign_in/google_sign_in.dart';
+
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
@@ -35,7 +34,8 @@ class _UpcomingPageState extends State<UpcomingPage> {
           itemBuilder: (context, DataSnapshot snapshot,
               Animation<double> animation) {
             return new event.
-            EventTile(animation: animation, snapshot: snapshot);
+            EventTile(
+                animation: animation, snapshot: snapshot, isStarredPage: false);
           }
       );
   }

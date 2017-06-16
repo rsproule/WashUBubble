@@ -3,30 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../AcademicStuff/loginStuff.dart' as login;
 
+
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
 
 class EventTile extends StatefulWidget {
   DataSnapshot snapshot;
   Animation animation;
+  bool isStarredPage;
 
-  EventTile({this.animation, this.snapshot});
+  EventTile({this.animation, this.snapshot, this.isStarredPage});
 
   @override
   _EventTileState createState() =>
-      new _EventTileState(animation, snapshot);
+      new _EventTileState(animation, snapshot, isStarredPage);
 }
 
 class _EventTileState extends State<EventTile> {
   DataSnapshot snapshot;
   Animation animation;
+  bool isStarredPage;
 
   bool hasStarred = false;
   int numStars;
 
-  _EventTileState(Animation a, DataSnapshot s) {
+  _EventTileState(Animation a, DataSnapshot s, bool b) {
     this.animation = a;
     this.snapshot = s;
+    this.isStarredPage = b;
     _loadImage();
     hasStarred = checkIfMember();
     numStars = getNumStars();
@@ -84,6 +88,8 @@ class _EventTileState extends State<EventTile> {
               children: <Widget>[
                 new Row(
                     children: <Widget>[
+
+                      this.isStarredPage ? new Container() :
                       new Column(children: <Widget>[
                         new IconButton(
                             icon: this.hasStarred ? new Icon(
@@ -110,10 +116,10 @@ class _EventTileState extends State<EventTile> {
                               new Container(
                                 padding: const EdgeInsets.only(left: 10.0),
                                 child: new Text(
-                                    snapshot.value['group_name'], style: Theme
+                                  snapshot.value['group_name'], style: Theme
                                     .of(context)
                                     .textTheme
-                                    .subhead),
+                                    .subhead,),
                               ),
                             ]
                         ),
@@ -307,11 +313,18 @@ class _EventTileState extends State<EventTile> {
     DatabaseReference eventRef = FirebaseDatabase.instance.reference().child(
         "foodEvents");
 
-    //push this user to the starred under the event id (snap key)
-    await StarRef.child(snapshot.key).push().set({
-      "user_id": userInfo.currentUser.id,
-      "username": userInfo.currentUser.displayName,
-      "photo_url": userInfo.currentUser.photoUrl
+    //the events info goes into the users list of events
+    // does not need the stars obj tho
+    await StarRef.child(userInfo.currentUser.id).child(snapshot.key).set({
+      "name": snapshot.value['name'],
+      "group_name": snapshot.value['group_name'],
+      "food_type": snapshot.value['food_type'],
+      "description": snapshot.value['description'],
+      "location": snapshot.value['location'],
+      "date": snapshot.value['date'],
+      "start_time": snapshot.value['start_time'],
+      "end_time": snapshot.value['end_time'],
+      "image_url": snapshot.value['image_url'],
     });
 
 
@@ -323,17 +336,10 @@ class _EventTileState extends State<EventTile> {
 
 
     // set the food event to be the same but now with the new user added to star list
-    await eventRef.child(snapshot.key).set({
-      "name": snapshot.value['name'],
-      "group_name": snapshot.value['group_name'],
-      "food_type": snapshot.value['food_type'],
-      "description": snapshot.value['description'],
-      "location": snapshot.value['location'],
-      "date": snapshot.value['date'],
-      "start_time": snapshot.value['start_time'],
-      "end_time": snapshot.value['end_time'],
-      "image_url": snapshot.value['image_url'],
-      "stars": newStar
+    await eventRef.child(snapshot.key).child("stars").child(
+        userInfo.currentUser.id).set({
+      "username": userInfo.currentUser.id,
+      "photo_url": userInfo.currentUser.photoUrl
     });
 
     if (this.mounted) {
