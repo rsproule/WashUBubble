@@ -56,7 +56,8 @@ class _JobsPageState extends State<JobsPage>
                   unselectedLabelColor: Colors.blueGrey,
                   indicatorColor: Colors.blue,
                   controller: _tabController,
-                  tabs: myTabs
+                tabs: myTabs,
+
               ),
               new Expanded(
                 child:

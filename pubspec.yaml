@@ -8,6 +8,7 @@ dependencies:
   firebase_database: ^0.0.4
   firebase_auth: ^0.0.2
   image_picker: ^0.0.2
+  firebase_storage: ^0.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

@@ -120,20 +120,27 @@ class _EventTileState extends State<EventTile> {
                 ),
 
                 new Container(
-                  //todo change to be asynchronous for better UX
+                  //todo needs to cache in the parent widget
                     padding: const EdgeInsets.all(4.0),
                     child:
                     new Container(
-                        decoration: new BoxDecoration(
-                            border: new Border.all(
-                                color: Colors.grey, width: 1.0)
-                        ),
-                        child: new Image.network(
-                          "https://wallpaperbrowse.com/media/images/8DJWnR85.jpg",
+//                        decoration: new BoxDecoration(
+//                            border: new Border.all(
+//                                color: Colors.grey, width: 1.0)
+//                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 7.0),
+
+
+                        child: snapshot.value['image_url'] == null
+                            ? new Image.network(
+                          "http://edmhousenetwork.net/upload/gates/default.jpg",
+                          height: 380.0,
+                          width: 400.0,
+                        ) : new Image.network(
+                          snapshot.value['image_url'],
                           height: 380.0,
                           width: 400.0,
                         )
-
 //                        this.image != null
 //                            ? this.image
 //                            : new Container(
@@ -205,7 +212,12 @@ class _EventTileState extends State<EventTile> {
                 new Row(
                     children: <Widget>[
                       new Icon(Icons.info_outline),
-                      new Text(snapshot.value['description']),
+                      new Expanded(child:
+                      new Container(padding: const EdgeInsets.only(left: 4.0),
+                          child: new Text(
+                              snapshot.value['description']))
+                      )
+
                     ]
                 ),
                 new Divider(color: Colors.transparent),

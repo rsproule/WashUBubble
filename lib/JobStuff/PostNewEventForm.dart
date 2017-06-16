@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../AcademicStuff/loginStuff.dart' as login;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class NewEventForm extends StatefulWidget {
   @override
@@ -265,7 +267,13 @@ class _NewEventFormState extends State<NewEventForm> {
 
                   : new Container(
                 padding: const EdgeInsets.all(4.0),
-                child: new Image.file(imageFile),
+                child: new Container(
+                  decoration: new BoxDecoration(
+                      border: new Border.all(
+                          color: Colors.grey, width: 1.0)
+                  ),
+                  child: new Image.file(imageFile, height: 380.0, width: 400.0),
+                ),
               ),
 
 
@@ -358,6 +366,7 @@ class _NewEventFormState extends State<NewEventForm> {
     descriptionHasError = false;
     locationHasError = false;
 
+
     String name = _nameController.text;
     if (name == "") {
       _handleSubmit(false, "Event Name Field empty", "name");
@@ -385,6 +394,11 @@ class _NewEventFormState extends State<NewEventForm> {
     String location = _locationController.text;
     if (location == "") {
       _handleSubmit(false, "Location Field empty", "location");
+      isValid = false;
+    }
+
+    if (imageFile == null) {
+      _handleSubmit(false, "Image Field empty");
       isValid = false;
     }
 
@@ -421,6 +435,8 @@ class _NewEventFormState extends State<NewEventForm> {
     String startTime = this.startTime.toString();
     String endTime = this.endTime.toString();
 
+    String image_url = await uploadImage(imageFile);
+
 
     if (isValid) {
       Future post = ref.push().set({
@@ -431,7 +447,8 @@ class _NewEventFormState extends State<NewEventForm> {
         "location": location,
         "date": date,
         "start_time": startTime,
-        "end_time": endTime
+        "end_time": endTime,
+        "image_url": image_url
       });
 
       post.then((value) => _handleSubmit(true, "success"))
@@ -501,5 +518,14 @@ class _NewEventFormState extends State<NewEventForm> {
       imageFile = image;
     }) : null
     ).catchError((error) => print("ERROR IN IMAGE UPLOAD" + error));
+  }
+
+  uploadImage(File imageFile) async {
+    int unique_num = new Random().nextInt(10000000);
+    StorageReference ref = FirebaseStorage.instance.ref().child(
+        "image_$unique_num.jpg");
+    StorageUploadTask uploadTask = ref.put(imageFile);
+    Uri downloadUrl = (await uploadTask.future).downloadUrl;
+    return downloadUrl.toString();
   }
 }
