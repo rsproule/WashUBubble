@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:google_sign_in/google_sign_in.dart';
+import '../AcademicStuff/loginStuff.dart' as login;
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
@@ -20,10 +21,39 @@ class _EventTileState extends State<EventTile> {
   DataSnapshot snapshot;
   Animation animation;
 
+  bool hasStarred = false;
+  int numStars;
+
   _EventTileState(Animation a, DataSnapshot s) {
     this.animation = a;
     this.snapshot = s;
     _loadImage();
+    hasStarred = checkIfMember();
+    numStars = getNumStars();
+  }
+
+  bool checkIfMember() {
+    GoogleSignIn user = login.getUser();
+    String user_id = user.currentUser.id;
+    Map classMembers = snapshot.value['stars'];
+    bool isMem;
+    if (classMembers != null) {
+      isMem = classMembers.containsKey(user_id);
+    } else {
+      isMem = false;
+    }
+    return isMem;
+  }
+
+  int getNumStars() {
+    if (snapshot.value['stars'] == null) return 0;
+    Map stars = snapshot.value['stars'];
+    int count = 0;
+    stars.forEach((k, v) {
+      count++;
+    });
+
+    return count;
   }
 
   Image image;
@@ -56,9 +86,11 @@ class _EventTileState extends State<EventTile> {
                     children: <Widget>[
                       new Column(children: <Widget>[
                         new IconButton(
-                            icon: new Icon(Icons.star),
-                            onPressed: _addToStarred),
-                        new Text("13"), // TODO show the
+                            icon: this.hasStarred ? new Icon(
+                                Icons.star, color: Colors.yellow) : new Icon(
+                                Icons.star),
+                            onPressed: this.hasStarred ? null : _addToStarred),
+                        new Text(numStars.toString()), // TODO show the
                         // number of people that
                         // have starred this
                       ]
@@ -124,11 +156,12 @@ class _EventTileState extends State<EventTile> {
                     padding: const EdgeInsets.all(4.0),
                     child:
                     new Container(
-//                        decoration: new BoxDecoration(
+                        decoration: new BoxDecoration(
 //                            border: new Border.all(
 //                                color: Colors.grey, width: 1.0)
-//                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 7.0),
+                          color: new Color.fromRGBO(226, 226, 226, 1.0),
+                        ),
+//                        padding: const EdgeInsets.symmetric(vertical: 7.0),
 
 
                         child: snapshot.value['image_url'] == null
@@ -141,16 +174,6 @@ class _EventTileState extends State<EventTile> {
                           height: 380.0,
                           width: 400.0,
                         )
-//                        this.image != null
-//                            ? this.image
-//                            : new Container(
-//
-//                            width: 400.0,
-//                            height: 380.0,
-//                            child: new Center(
-//                                child: new CircularProgressIndicator()
-//                            )
-//                        )
                     )
                 ),
                 new Row(
@@ -273,9 +296,52 @@ class _EventTileState extends State<EventTile> {
   }
 
 
-  void _addToStarred() {
-    //Todo update the starred
+  _addToStarred() async {
+    //Todo update the star list
 
+    GoogleSignIn userInfo = login.getUser();
+
+
+    DatabaseReference StarRef = FirebaseDatabase.instance.reference().child(
+        "stars");
+    DatabaseReference eventRef = FirebaseDatabase.instance.reference().child(
+        "foodEvents");
+
+    //push this user to the starred under the event id (snap key)
+    await StarRef.child(snapshot.key).push().set({
+      "user_id": userInfo.currentUser.id,
+      "username": userInfo.currentUser.displayName,
+      "photo_url": userInfo.currentUser.photoUrl
+    });
+
+
+    Map newStar = new Map();
+    newStar =
+    snapshot.value['stars'] == null ? new Map() : snapshot.value['stars'];
+
+    newStar.putIfAbsent(userInfo.currentUser.id, () => true);
+
+
+    // set the food event to be the same but now with the new user added to star list
+    await eventRef.child(snapshot.key).set({
+      "name": snapshot.value['name'],
+      "group_name": snapshot.value['group_name'],
+      "food_type": snapshot.value['food_type'],
+      "description": snapshot.value['description'],
+      "location": snapshot.value['location'],
+      "date": snapshot.value['date'],
+      "start_time": snapshot.value['start_time'],
+      "end_time": snapshot.value['end_time'],
+      "image_url": snapshot.value['image_url'],
+      "stars": newStar
+    });
+
+    if (this.mounted) {
+      setState(() {
+        hasStarred = true;
+        numStars += 1;
+      });
+    }
   }
 
   Future<Image> _getImage() async {

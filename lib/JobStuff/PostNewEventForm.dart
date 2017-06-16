@@ -448,7 +448,9 @@ class _NewEventFormState extends State<NewEventForm> {
         "date": date,
         "start_time": startTime,
         "end_time": endTime,
-        "image_url": image_url
+        "image_url": image_url,
+        "stars": {
+        }
       });
 
       post.then((value) => _handleSubmit(true, "success"))
