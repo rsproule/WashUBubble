@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 
 // Firebase db stuff:
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 class EventTile extends StatefulWidget {
   DataSnapshot snapshot;
@@ -13,14 +13,20 @@ class EventTile extends StatefulWidget {
 
   @override
   _EventTileState createState() =>
-      new _EventTileState(animation: animation, snapshot: snapshot);
+      new _EventTileState(animation, snapshot);
 }
 
 class _EventTileState extends State<EventTile> {
   DataSnapshot snapshot;
   Animation animation;
 
-  _EventTileState({this.animation, this.snapshot});
+  _EventTileState(Animation a, DataSnapshot s) {
+    this.animation = a;
+    this.snapshot = s;
+    _loadImage();
+  }
+
+  Image image;
 
 
   @override
@@ -46,15 +52,15 @@ class _EventTileState extends State<EventTile> {
       return new Card(
           child: new Column(
               children: <Widget>[
-
                 new Row(
                     children: <Widget>[
                       new Column(children: <Widget>[
                         new IconButton(
                             icon: new Icon(Icons.star),
                             onPressed: _addToStarred),
-                        new Text(
-                            "13"), // print the  number of people that have starred this
+                        new Text("13"), // TODO show the
+                        // number of people that
+                        // have starred this
                       ]
                       ),
                       new Expanded(
@@ -100,10 +106,9 @@ class _EventTileState extends State<EventTile> {
 
                                 timeTillEventIsOver > 0 && timeTillEvent < 0
                                     ? new Text("Ongoing",
-                                    style: new TextStyle(color: Colors.green))
+                                    style: new TextStyle(
+                                        color: Colors.green, fontSize: 18.0))
                                     : new Text("")
-
-
                               ]
                           ),
 
@@ -115,12 +120,31 @@ class _EventTileState extends State<EventTile> {
                 ),
 
                 new Container(
-                  padding: const EdgeInsets.all(4.0),
-                  child: new Image.network(
-                    "https://wallpaperbrowse.com/media/images/8DJWnR85.jpg",
-                    height: 380.0,
-                    width: 400.0,
-                  ),
+                  //todo change to be asynchronous for better UX
+                    padding: const EdgeInsets.all(4.0),
+                    child:
+                    new Container(
+                        decoration: new BoxDecoration(
+                            border: new Border.all(
+                                color: Colors.grey, width: 1.0)
+                        ),
+                        child: new Image.network(
+                          "https://wallpaperbrowse.com/media/images/8DJWnR85.jpg",
+                          height: 380.0,
+                          width: 400.0,
+                        )
+
+//                        this.image != null
+//                            ? this.image
+//                            : new Container(
+//
+//                            width: 400.0,
+//                            height: 380.0,
+//                            child: new Center(
+//                                child: new CircularProgressIndicator()
+//                            )
+//                        )
+                    )
                 ),
                 new Row(
                     children: <Widget>[
@@ -132,16 +156,16 @@ class _EventTileState extends State<EventTile> {
                               new Row(
                                   children: <Widget>[
                                     new Icon(Icons.location_on),
-                                    new Text(snapshot.value['location']),
+                                    new Text(" " + snapshot.value['location']),
                                   ]
                               ),
                               new Divider(color: Colors.transparent),
                               new Row(
                                   children: <Widget>[
                                     new Icon(Icons.timer),
-                                    new Text(
+                                    new Text(" " +
                                         snapshot.value['start_time'] + " - " +
-                                            snapshot.value['end_time']),
+                                        snapshot.value['end_time']),
                                   ]
                               ),
                               new Divider(color: Colors.transparent)
@@ -158,7 +182,7 @@ class _EventTileState extends State<EventTile> {
                               new Row(
                                   children: <Widget>[
                                     new Icon(Icons.fastfood),
-                                    new Text(snapshot.value['food_type']),
+                                    new Text(" " + snapshot.value['food_type']),
                                   ]
                               ),
                               new Divider(color: Colors.transparent),
@@ -238,5 +262,50 @@ class _EventTileState extends State<EventTile> {
 
 
   void _addToStarred() {
+    //Todo update the starred
+
   }
+
+  Future<Image> _getImage() async {
+//    return new Image.memory(await http.readBytes("https://wallpaperbrowse.com/media/images/8DJWnR85.jpg")) ;
+//
+    return new Image.network(
+      "https://wallpaperbrowse.com/media/images/8DJWnR85.jpg",
+      height: 380.0,
+      width: 400.0,
+    );
+  }
+
+  _loadImage() async {
+    _getImage().then((img) => _handleImage(img)
+
+    ).catchError((err) => _errorLoadingImage(err));
+  }
+
+  _handleImage(Image img) {
+//    print(img);
+    if (img == null) {
+      _errorLoadingImage();
+    }
+
+    if (this.mounted) {
+      setState(() {
+        image = img;
+      });
+    }
+  }
+
+
+  _errorLoadingImage([err]) {
+    print(err);
+    if (this.mounted) {
+      setState(() {
+        //error image
+        image = new Image.network(
+            "https://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/12/1450973046wordpress-errors.png");
+      });
+    }
+  }
+
+
 }

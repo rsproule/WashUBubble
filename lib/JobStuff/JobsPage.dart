@@ -34,6 +34,7 @@ class _JobsPageState extends State<JobsPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+//        backgroundColor: new Color.fromRGBO(210, 213, 219, 1.0),
 
         floatingActionButton: new FloatingActionButton(
             child: new Icon(Icons.add),

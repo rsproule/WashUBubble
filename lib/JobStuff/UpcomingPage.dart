@@ -29,20 +29,14 @@ class _UpcomingPageState extends State<UpcomingPage> {
     return
 
       new FirebaseAnimatedList(
-        query: events,
+          query: events,
           defaultChild: new Center(child: new CircularProgressIndicator()),
           sort: byTime,
-        itemBuilder: (context, DataSnapshot snapshot,
-            Animation<double> animation) {
-//          if (new DateTime.now()
-//              .difference(DateTime.parse(snapshot.value['date']))
-//              .inMinutes < 0) {
-
-            return new event.EventTile(
-                animation: animation, snapshot: snapshot);
-//          }
-        }
-
-    );
+          itemBuilder: (context, DataSnapshot snapshot,
+              Animation<double> animation) {
+            return new event.
+            EventTile(animation: animation, snapshot: snapshot);
+          }
+      );
   }
 }
