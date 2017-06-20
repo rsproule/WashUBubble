@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import './PreviewPage.dart' as preview;
 
 class NewEventForm extends StatefulWidget {
   @override
@@ -56,8 +57,15 @@ class _NewEventFormState extends State<NewEventForm> {
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("New Event"),
+          actions: <Widget>[
+            new MaterialButton(
+                child: new Text("Preview Post"),
+                onPressed: _showPreview()
+            )
+          ],
 
         ),
+
 
         body: new ListView(
             children: <Widget>[
@@ -558,5 +566,45 @@ class _NewEventFormState extends State<NewEventForm> {
       context: context,
 
     );
+  }
+
+  _showPreview() async {
+    // data to send
+    String name = _nameController.text;
+    String group = _groupNameController.text;
+    String foodType = _foodController.text;
+    String description = _descriptionController.text;
+    String location = _locationController.text;
+
+    DateTime d = new DateTime(
+        this.day.year, this.day.month, this.day.day, this.startTime.hour,
+        this.startTime.minute);
+    String date = d
+        .toString(); // convert back back with DateTime.parse()
+    String startTime = this.startTime.toString();
+    String endTime = this.endTime.toString();
+
+    String image_url = await uploadImage(imageFile);
+
+
+    // wrap data in a map for easy shipping
+    Map data = {
+      "name": name,
+      "group_name": group,
+      "food_type": foodType,
+      "description": description,
+      "location": location,
+      "date": date,
+      "start_time": startTime,
+      "end_time": endTime,
+      "image_url": image_url,
+    };
+
+
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (BuildContext context) {
+          return new preview.PreviewPage(data);
+        }
+    ));
   }
 }
