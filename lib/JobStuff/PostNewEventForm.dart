@@ -315,7 +315,7 @@ class _NewEventFormState extends State<NewEventForm> {
       _descriptionController.clear();
       _foodController.clear();
       _locationController.clear();
-
+      Navigator.of(context).pop();
       Navigator.of(context).pop();
       _successDialog();
     }
@@ -356,6 +356,9 @@ class _NewEventFormState extends State<NewEventForm> {
   }
 
   _submitEvent() async {
+    _showProgressDialog();
+
+
     DatabaseReference ref = FirebaseDatabase.instance.reference().child(
         'foodEvents');
     bool isValid = true;
@@ -529,5 +532,31 @@ class _NewEventFormState extends State<NewEventForm> {
     StorageUploadTask uploadTask = ref.put(imageFile);
     Uri downloadUrl = (await uploadTask.future).downloadUrl;
     return downloadUrl.toString();
+  }
+
+  void _showProgressDialog() {
+    showDialog(
+      child: new Dialog(
+
+          child: new ConstrainedBox(
+              constraints: new BoxConstraints(
+                maxHeight: 150.1,
+                maxWidth: 10.1,
+                minHeight: 100.0,
+                minWidth: 10.0,
+              ),
+              child: new Column(
+                  children: <Widget>[
+                    new Divider(color: Colors.white),
+                    new CircularProgressIndicator(),
+                    new Divider(color: Colors.white, height: 12.0),
+                    new Text("Posting...")
+                  ]
+              )
+          )
+      ),
+      context: context,
+
+    );
   }
 }
