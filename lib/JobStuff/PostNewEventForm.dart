@@ -60,7 +60,10 @@ class _NewEventFormState extends State<NewEventForm> {
           actions: <Widget>[
             new MaterialButton(
                 child: new Text("Preview Post"),
-                onPressed: _showPreview()
+                onPressed: () {
+                  print("before");
+                  _showPreview();
+                }
             )
           ],
 
@@ -569,6 +572,7 @@ class _NewEventFormState extends State<NewEventForm> {
   }
 
   _showPreview() async {
+    print('here');
     // data to send
     String name = _nameController.text;
     String group = _groupNameController.text;
@@ -584,7 +588,7 @@ class _NewEventFormState extends State<NewEventForm> {
     String startTime = this.startTime.toString();
     String endTime = this.endTime.toString();
 
-    String image_url = await uploadImage(imageFile);
+    File image = this.imageFile;
 
 
     // wrap data in a map for easy shipping
@@ -597,13 +601,12 @@ class _NewEventFormState extends State<NewEventForm> {
       "date": date,
       "start_time": startTime,
       "end_time": endTime,
-      "image_url": image_url,
     };
 
 
     Navigator.of(context).push(new MaterialPageRoute(
         builder: (BuildContext context) {
-          return new preview.PreviewPage(data);
+          return new preview.PreviewPage(data, image);
         }
     ));
   }
