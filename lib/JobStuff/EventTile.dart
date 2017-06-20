@@ -32,8 +32,14 @@ class _EventTileState extends State<EventTile> {
     this.snapshot = s;
     this.isStarredPage = b;
     _loadImage();
-    hasStarred = checkIfMember();
-    numStars = getNumStars();
+    if (this.isStarredPage) {
+      hasStarred = true;
+//      print( int.parse(snapshot.value['numStars']));
+      numStars = snapshot.value['numStars'];
+    } else {
+      hasStarred = checkIfMember();
+      numStars = getNumStars();
+    }
   }
 
   bool checkIfMember() {
@@ -89,7 +95,7 @@ class _EventTileState extends State<EventTile> {
                 new Row(
                     children: <Widget>[
 
-                      this.isStarredPage ? new Container() :
+
                       new Column(children: <Widget>[
                         new IconButton(
                             icon: this.hasStarred ? new Icon(
@@ -325,6 +331,7 @@ class _EventTileState extends State<EventTile> {
       "start_time": snapshot.value['start_time'],
       "end_time": snapshot.value['end_time'],
       "image_url": snapshot.value['image_url'],
+      "numStars": numStars + 1
     });
 
 
